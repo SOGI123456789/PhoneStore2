@@ -23,7 +23,7 @@ class CategoryController extends Controller
     }
     public function index()
     {
-        $categories = $this->category->latest()->paginate(5);
+            $categories = $this->category->latest()->paginate(5);
         return view('categories.index',compact('categories'));
     }
     public function store(Request $request)

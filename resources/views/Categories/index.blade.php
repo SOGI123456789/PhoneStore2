@@ -27,17 +27,15 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @foreach($categories->items()as $category)
-                            <tr>
-                                <th scope="row">{{$categories->id}}</th>
-                                <td> {{$categories->name}}</td>
-                                <td>
-                                    <a href=""class="btn-default">Sửa</a>
-                                     <a href=""class="btn-default">Xóa</a>
-                                </td>
-
-
-                            </tr>
+                            @foreach($categories->items() as $category)
+                                <tr>
+                                    <th scope="row">{{$category->id}}</th>
+                                    <td> {{$category->name}}</td>
+                                    <td>
+                                        <a href="" class="btn-default">Sửa</a>
+                                        <a href="" class="btn-default">Xóa</a>
+                                    </td>
+                                </tr>
                             @endforeach
                             </tbody>
                         </table>

@@ -9,7 +9,7 @@ Route::get('/', function () {
 });
 Route::get('/home', function () {
     return view('home'); // dòng 8-9 có ý nghĩa là khi nhập vào direct link /home thì nó sẽ load view home.blade.php
-});
+})->name('home');
 Route::prefix('categories')->group(function () {
     Route::get('/create', [
         'as'=>'categories.create',

@@ -41,7 +41,7 @@ class LoginController extends Controller
         // So sánh mật khẩu plain text cho admin
         if ($admin && $request->password === $admin->password) {
             session(['admin' => $admin]);
-            return redirect()->route('/home');
+            return redirect()->route('home');
         }
 
         return back()->withErrors(['email' => 'Tài khoản hoặc mật khẩu không đúng!']);

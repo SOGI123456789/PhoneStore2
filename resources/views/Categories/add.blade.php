@@ -11,7 +11,7 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-                    <div class="col-12"> <!-- Thay col-m-6 bằng col-12 -->
+                    <div class="col-12">
                         <form action="{{route('categories.store')}}" method="post">
                             @csrf
                             <div class="form-group">
@@ -20,7 +20,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="danhMucCha">Chọn danh mục cha</label>
-                                <select class="form-control"name="parent_id">
+                                <select class="form-control" name="parent_id">
                                     <option value="0">Chọn danh mục cha</option>
                                     {!!$htmlOption!!}
                                 </select>
