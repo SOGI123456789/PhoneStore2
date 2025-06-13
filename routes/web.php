@@ -19,6 +19,10 @@ Route::prefix('categories')->group(function () {
         'as'=>'categories.index',
         'uses'=>'App\Http\Controllers\CategoryController@index'
     ]);
+    Route::post('/store', [
+        'as'=>'categories.store',                               // phương thức thêm danh mục sản phẩm
+        'uses'=>'App\Http\Controllers\CategoryController@store'
+    ]);
 });
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [RegisterController::class, 'register']);
