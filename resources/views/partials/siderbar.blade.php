@@ -30,7 +30,50 @@
                         <i class="nav-icon fas fa-th"></i>
                         <p>
                             Danh mục sản phẩm
-                            <span class="right badge badge-danger">New</span>
+
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('menus.index') }}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            Quản lý menu
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('categories.index')}}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                                Quản lý sản phẩm
+
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('categories.index')}}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            Phân quyền
+
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('categories.index')}}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            Quản lý đơn hàng
+
+                        </p>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{route('categories.index')}}" class="nav-link">
+                        <i class="nav-icon fas fa-th"></i>
+                        <p>
+                            Quản lý đơn hàng
                         </p>
                     </a>
                 </li>

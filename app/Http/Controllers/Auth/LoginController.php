@@ -34,7 +34,7 @@ class LoginController extends Controller
         }
 
         // Kiểm tra bảng admins (username hoặc email nếu có)
-        $admin = DB::table('admins')
+        $admin = DB::table('user')
             ->where('username', $request->email)
             ->first();
 
