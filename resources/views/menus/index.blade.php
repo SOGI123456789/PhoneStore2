@@ -34,7 +34,11 @@
                                     <td>{{ $menu->name }}</td>
                                     <td>
                                         <a href="{{ route('menus.edit', ['id' => $menu->id]) }}" class="btn btn-default">Sửa</a>
-                                        <a href="{{ route('menus.delete', ['id' => $menu->id]) }}" class="btn btn-danger">Xóa</a>
+                                        <form action="{{ route('menus.delete', ['id' => $menu->id]) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
+                                        </form>
                                     </td>
                                 </tr>
                             @endforeach
