@@ -9,6 +9,10 @@
     <form method="POST" action="{{ route('register') }}">
     @csrf
     <div>
+        <label>Họ tên:</label>
+        <input type="text" name="name" required>
+    </div>
+    <div>
         <label>Tên đăng nhập:</label>
         <input type="text" name="username" required>
     </div>

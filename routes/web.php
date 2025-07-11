@@ -6,14 +6,14 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RoleController;
 
-Route::get('/', function () {
+Route::get('/home', [HomeController::class, 'index'])->name('home');
+
+Route::get('/index', function () {
     return view('index');
 })->name('index');
-
-Route::get('/home', function () {
-    return view('home');
-})->name('home');
 
 //  CATEGORIES ROUTES
 Route::prefix('categories')->name('categories.')->group(function () {
@@ -52,4 +52,16 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::get('/edit/{product}', [ProductController::class, 'edit'])->name('edit');
     Route::post('/update/{product}', [ProductController::class, 'update'])->name('update');
     Route::delete('/delete/{product}', [ProductController::class, 'delete'])->name('delete');
+});
+
+//  ROLES ROUTES
+Route::prefix('roles')->name('roles.')->group(function () {
+    Route::get('/', [RoleController::class, 'index'])->name('index');
+    Route::get('/edit/{id}', [RoleController::class, 'edit'])->name('edit');
+    Route::post('/update/{id}', [RoleController::class, 'update'])->name('update');
+    Route::delete('/delete/{id}', [RoleController::class, 'delete'])->name('delete');
+});
+
+Route::get('/', function () {
+    return redirect()->route('index');
 });

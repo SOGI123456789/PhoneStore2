@@ -3,7 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use Illuminate\Http\Request;
-
+use App\Models\Category;
 class ProductController extends Controller
 {
     public function index()
@@ -14,14 +14,15 @@ class ProductController extends Controller
 
     public function create()
     {
-        return view('products.add');
+        $categories = Category::where('parent_id', '!=', 0)->get();
+        return view('products.add', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required',
-            'catalog_id' => 'nullable|integer',
+            'catalog_id' => 'required|integer',
             'content' => 'nullable|string',
             'price' => 'required|numeric',
             'discount_price' => 'nullable|numeric',
@@ -32,13 +33,16 @@ class ProductController extends Controller
             'rate_count' => 'nullable|integer',
         ]);
         $data = $request->all();
-        if ($request->hasFile('image_link')) {
-            $file = $request->file('image_link');
-            $fileName = time() . '_' . $file->getClientOriginalName();
-            $file->storeAs('public/products', $fileName); // Đúng chuẩn
-            $data['image_link'] = 'products/' . $fileName; // Không có public/ ở đầu
-        }
+
+            if ($request->hasFile('image_link')) {
+                $file = $request->file('image_link');
+                // Lưu file vào storage/app/public
+                $path = $file->store('products', 'public');
+                $data['image_link'] = $path;
+            }
+
         Product::create($data);
+
         return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công!');
     }
 

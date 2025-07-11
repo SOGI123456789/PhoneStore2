@@ -40,6 +40,15 @@
                                     <img src="{{ asset('storage/' . $product->image_link) }}" alt="Ảnh" width="80">
                                 @endif
                             </div>
+                            <div class="form-group">
+                                <label for="catalog_id">Danh mục sản phẩm</label>
+                                <select name="catalog_id" class="form-control" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <button type="submit" class="btn btn-success">Lưu</button>
                             <a href="{{ route('products.index') }}" class="btn btn-secondsary">Quay lại</a>
                         </form>

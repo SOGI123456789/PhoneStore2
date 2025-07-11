@@ -23,25 +23,30 @@ class LoginController extends Controller
             'password' => 'required|string',
         ]);
 
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            $user = Auth::user();
+            $user->load('role');
+            if ($user && $user->role && $user->role->name === 'admin') {
+                return redirect()->route('home');
+            } else {
+                return redirect()->route('index');
+            }
+        }
+
         // Kiểm tra bảng users (email hoặc username)
         $user = User::where('email', $request->email)
             ->orWhere('username', $request->email)
             ->first();
 
+        // Sử dụng Hash::check để kiểm tra mật khẩu mã hóa
         if ($user && Hash::check($request->password, $user->password)) {
             Auth::login($user);
-            return redirect()->route('index');
-        }
-
-        // Kiểm tra bảng admins (username hoặc email nếu có)
-        $admin = DB::table('user')
-            ->where('username', $request->email)
-            ->first();
-
-        // So sánh mật khẩu plain text cho admin
-        if ($admin && $request->password === $admin->password) {
-            session(['admin' => $admin]);
-            return redirect()->route('home');
+            if ($user->role_id == 1) { // 1 là admin
+                return redirect()->route('home');
+            } else {
+                return redirect()->route('index');
+            }
         }
 
         return back()->withErrors(['email' => 'Tài khoản hoặc mật khẩu không đúng!']);

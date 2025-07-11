@@ -34,7 +34,7 @@
                                     <td>{{ $category->name }}</td>
                                     <td>
                                         <a href="{{ route('categories.edit', ['id' => $category->id]) }}" class="btn btn-default">Sửa</a>
-                                        <form action="{{ route('products.delete', ['product' => $product->id]) }}" method="POST" style="display:inline;">
+                                        <form action="{{ route('categories.delete', ['id' => $category->id]) }}" method="POST" style="display:inline;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>

@@ -19,6 +19,7 @@ class RegisterController extends Controller
     public function register(Request $request)
     {
         $request->validate([
+            'name'          => 'required|string|max:100',
             'username'      => 'required|string|max:100|unique:users',
             'email'         => 'required|string|email|max:100|unique:users',
             'password'      => 'required|string|min:6|confirmed',
@@ -26,9 +27,10 @@ class RegisterController extends Controller
         ]);
 
         $user = User::create([
+            'name'          => $request->name,
             'username'      => $request->username,
             'email'         => $request->email,
-            'password' => Hash::make($request->password),
+            'password'      => Hash::make($request->password),
             'phone_number'  => $request->phone_number,
             'role_id'       => 2, // Mặc định là user
         ]);
