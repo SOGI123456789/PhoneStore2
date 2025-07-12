@@ -8,6 +8,7 @@
 <meta name="author" content="">
 <meta name="keywords" content="MediaCenter, Template, eCommerce">
 <meta name="robots" content="all">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Flipmart premium HTML5 & CSS3 Template</title>
 
 <!-- Bootstrap Core CSS -->
@@ -36,17 +37,7 @@
 <!-- ============================================== HEADER ============================================== -->
 @include('partials.headerKH')
 <!-- ============================================== HEADER : END ============================================== -->
-<div class="share-fast-mall">
-  <div class="youtube-button">
-    <a href="https://www.youtube.com/channel/your-channel-id-here" target="_blank"  title="link youtube"><i class="fa-brands fa-youtube"></i></a>
-  </div>
-  <div class="fb-button">
-    <a href="https://www.youtube.com/channel/your-channel-id-here" target="_blank"  title="link facebook"><i class="fa-brands fa-facebook-f"></i></a>
-  </div>
-  <div class="tt-button">
-    <a href="https://www.youtube.com/channel/your-channel-id-here" target="_blank"  title="link tiktok"><i class="fa-brands fa-tiktok"></i></a>
-  </div>
-</div>
+
 
 <!-- ============================================== HEADER : END ============================================== -->
 <div class="body-content outer-top-xs" id="top-banner-and-menu">
@@ -96,9 +87,14 @@
                     <p style="margin-bottom: 10px; color: #e74c3c; font-weight: bold; font-size: 16px;">
                       <strong>Giá bán:</strong> {{ number_format($product->price, 0, ',', '.') }}đ
                     </p>
-                    <a href="{{ route('product.detail', $product->id) }}" class="btn btn-primary" style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 5px;">
-                      Xem ngay
-                    </a>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                      <a href="{{ route('product.detail', $product->id) }}" class="btn btn-primary" style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 5px; flex: 1;">
+                        Xem ngay
+                      </a>
+                      <button onclick="addToCart({{ $product->id }})" class="btn btn-success" style="background: linear-gradient(45deg, #27ae60, #229954); color: white; border: none; border-radius: 5px; flex: 1;">
+                        <i class="fa fa-cart-plus"></i> Thêm
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -147,5 +143,35 @@
 <script src="{{asset('assets/js/scripts.js')}}"></script>
 <script src="{{asset('assets/js/script_k.js')}}"></script>
 <script src="{{asset('assets/js/do.js')}}"></script>
+
+<script>
+function addToCart(productId) {
+    $.ajaxSetup({
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        }
+    });
+    
+    $.ajax({
+        url: '{{ route("cart.add") }}',
+        method: 'POST',
+        data: {
+            product_id: productId,
+            quantity: 1
+        },
+        success: function(response) {
+            if(response.success) {
+                // Hiển thị thông báo thành công
+                alert(response.message);
+                // Cập nhật số lượng giỏ hàng
+                $('.basket-item-count .count').text(response.cart_count);
+            }
+        },
+        error: function(xhr) {
+            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+        }
+    });
+}
+</script>
 </body>
 </html>

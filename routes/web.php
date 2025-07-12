@@ -8,10 +8,46 @@ use App\Http\Controllers\MenuController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::get('/index', [HomeController::class, 'showIndex'])->name('index');
+
+// Shopping cart route
+Route::get('/shopping-cart', [CartController::class, 'index'])->name('shopping-cart');
+
+// Cart routes
+Route::prefix('cart')->name('cart.')->group(function () {
+    Route::post('/add', [CartController::class, 'addToCart'])->name('add');
+    Route::post('/update', [CartController::class, 'updateCart'])->name('update');
+    Route::post('/remove', [CartController::class, 'removeFromCart'])->name('remove');
+    Route::get('/count', [CartController::class, 'getCartCount'])->name('count');
+});
+
+// Checkout route
+Route::get('/checkout', [OrderController::class, 'checkout'])->name('checkout');
+
+// Order routes (for customers)
+Route::prefix('orders')->name('orders.')->group(function () {
+    Route::post('/create', [OrderController::class, 'createOrder'])->name('create');
+    Route::get('/', [OrderController::class, 'index'])->name('index');
+    Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+});
+
+// Place order routes
+Route::post('/place-order', [OrderController::class, 'placeOrder'])->name('place-order');
+Route::post('/order/place', [OrderController::class, 'placeOrder'])->name('order.place');
+Route::get('/order/success/{id}', [OrderController::class, 'orderSuccess'])->name('order.success');
+
+// Admin Order routes  
+Route::prefix('admin/orders')->name('admin.orders.')->group(function () {
+    Route::get('/', [OrderController::class, 'adminIndex'])->name('index');
+    Route::get('/{id}', [OrderController::class, 'adminShow'])->name('show');
+    Route::put('/{id}/status', [OrderController::class, 'updateStatus'])->name('update-status');
+    Route::delete('/{id}', [OrderController::class, 'destroy'])->name('destroy');
+});
 
 //  CATEGORIES ROUTES
 Route::prefix('categories')->name('categories.')->group(function () {

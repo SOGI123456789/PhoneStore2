@@ -17,6 +17,7 @@ class Product extends Model
         'buyed',
         'rate_total',
         'rate_count',
+        'quantity',
     ];
 
     // Quan hệ với Category

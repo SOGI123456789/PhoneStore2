@@ -31,6 +31,7 @@ class ProductController extends Controller
             'buyed' => 'nullable|integer',
             'rate_total' => 'nullable|integer',
             'rate_count' => 'nullable|integer',
+            'quantity' => 'required|integer|min:0',
         ]);
         $data = $request->all();
 
@@ -64,6 +65,7 @@ class ProductController extends Controller
             'buyed' => 'nullable|integer',
             'rate_total' => 'nullable|integer',
             'rate_count' => 'nullable|integer',
+            'quantity' => 'required|integer|min:0',
         ]);
         $data = $request->all();
         if ($request->hasFile('image_link')) {
