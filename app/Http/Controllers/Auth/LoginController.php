@@ -16,17 +16,46 @@ class LoginController extends Controller
         return view('login');
     }
 
+    public function showRegistrationForm()
+    {
+        return view('login');
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'name'     => 'required|string|max:100',
+            'email'    => 'required|string|email|max:100|unique:users',
+            'phone'    => 'required|string|max:20',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+
+        $user = User::create([
+            'name'     => $request->name,
+            'email'    => $request->email,
+            'phone'    => $request->phone,
+            'password' => Hash::make($request->password),
+            'role_id'  => 2, // Mặc định là user
+        ]);
+
+        Auth::login($user);
+        return redirect()->route('index')->with('success', 'Đăng ký thành công!');
+    }
+
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|string',
+            'email'    => 'required|email',
             'password' => 'required|string',
         ]);
 
         $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
+        $remember = $request->has('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
             $user->load('role');
+            
             if ($user && $user->role && $user->role->name === 'admin') {
                 return redirect()->route('home');
             } else {
@@ -34,22 +63,9 @@ class LoginController extends Controller
             }
         }
 
-        // Kiểm tra bảng users (email hoặc username)
-        $user = User::where('email', $request->email)
-            ->orWhere('username', $request->email)
-            ->first();
-
-        // Sử dụng Hash::check để kiểm tra mật khẩu mã hóa
-        if ($user && Hash::check($request->password, $user->password)) {
-            Auth::login($user);
-            if ($user->role_id == 1) { // 1 là admin
-                return redirect()->route('home');
-            } else {
-                return redirect()->route('index');
-            }
-        }
-
-        return back()->withErrors(['email' => 'Tài khoản hoặc mật khẩu không đúng!']);
+        return back()->withErrors([
+            'email' => 'Email hoặc mật khẩu không đúng!'
+        ])->withInput($request->only('email'));
     }
 
     public function logout(Request $request)

@@ -10,7 +10,19 @@
             <li><a href="#"><i class="fa fa-envelope-open-o"></i> Chính sách bảo hành & đổi trả</a></li>
             <li><a href="#"><i class="fa fa-comment"></i> Góp ý & phản hồi</a></li>
             <li><a href="#"><i class="fas fa-box"></i> Theo dõi đơn hàng</a></li>
-            <li><a href="{{ route('login') }}"><i class="icon fa fa-user"></i> Đăng ký/Đăng nhập</a></li>
+            @auth
+              <li><a href="#"><i class="icon fa fa-user"></i> Xin chào, {{ Auth::user()->name }}</a></li>
+              <li>
+                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                  @csrf
+                  <button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 0;">
+                    <i class="icon fa fa-sign-out"></i> Đăng xuất
+                  </button>
+                </form>
+              </li>
+            @else
+              <li><a href="{{ route('login') }}"><i class="icon fa fa-user"></i> Đăng ký/Đăng nhập</a></li>
+            @endauth
           </ul>
         </div>
         <!-- /.cnt-account -->
