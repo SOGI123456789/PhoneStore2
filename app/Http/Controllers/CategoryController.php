@@ -77,4 +77,10 @@ class CategoryController extends Controller
         $category->delete();
         return redirect()->route('categories.index')->with('success', 'Xóa thành công!');
     }
+    public function show($id)
+    {
+        $category = Category::with('products.attributes')->findOrFail($id);
+        $products = $category->products;
+        return view('category', compact('category', 'products'));
+    }
 }

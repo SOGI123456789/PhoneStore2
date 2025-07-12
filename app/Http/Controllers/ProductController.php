@@ -81,4 +81,9 @@ class ProductController extends Controller
         $product->delete();
         return redirect()->route('products.index')->with('success', 'Xóa sản phẩm thành công!');
     }
+    public function detail($id)
+    {
+        $product = Product::with('attributes')->findOrFail($id);
+        return view('detail', compact('product'));
+    }
 }

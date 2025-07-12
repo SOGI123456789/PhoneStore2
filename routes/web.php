@@ -11,9 +11,7 @@ use App\Http\Controllers\RoleController;
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
-Route::get('/index', function () {
-    return view('index');
-})->name('index');
+Route::get('/index', [HomeController::class, 'showIndex'])->name('index');
 
 //  CATEGORIES ROUTES
 Route::prefix('categories')->name('categories.')->group(function () {
@@ -65,3 +63,6 @@ Route::prefix('roles')->name('roles.')->group(function () {
 Route::get('/', function () {
     return redirect()->route('index');
 });
+// Product detail route
+Route::get('/product/{id}', [ProductController::class, 'detail'])->name('product.detail');
+Route::get('/category/{id}', [App\Http\Controllers\CategoryController::class, 'show'])->name('category.show');

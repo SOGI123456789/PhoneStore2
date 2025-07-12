@@ -34,6 +34,10 @@
                                 <input type="number" class="form-control" name="price" value="{{ old('price') }}" required>
                             </div>
                             <div class="form-group">
+                                <label for="quantity">Số lượng</label>
+                                <input type="number" class="form-control" name="quantity" value="{{ old('quantity', 0) }}" min="0" required>
+                            </div>
+                            <div class="form-group">
                                 <label for="image_link">Ảnh sản phẩm</label>
                                 <input type="file" class="form-control" name="image_link">
                                 @if(isset($product) && $product->image_link)
