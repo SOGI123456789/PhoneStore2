@@ -8,11 +8,34 @@ class Order extends Model
 {
     protected $fillable = [
         'user_id',
+        'customer_name',
+        'customer_email',
+        'customer_phone',
+        'customer_address',
         'total_amount',
-        'status'
+        'status',
+        'payment_method',
+        'payment_status',
+        'notes'
     ];
 
-    public $timestamps = false; // Nếu không có updated_at
+    // Cast các cột thành kiểu dữ liệu phù hợp
+    protected $casts = [
+        'created_at' => 'datetime',
+        'total_amount' => 'decimal:2'
+    ];
+
+    public $timestamps = false; // Tắt timestamps nếu không muốn sử dụng updated_at
+    
+    // Nếu muốn tự động set created_at khi tạo
+    protected static function boot()
+    {
+        parent::boot();
+        
+        static::creating(function ($model) {
+            $model->created_at = now();
+        });
+    }
 
     // Quan hệ với OrderItem
     public function items()

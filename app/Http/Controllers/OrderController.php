@@ -69,16 +69,19 @@ class OrderController extends Controller
     // Tạo đơn hàng qua AJAX
     public function createOrder(Request $request)
     {
-        if (!Auth::check()) {
-            return response()->json(['error' => 'Bạn cần đăng nhập để đặt hàng'], 401);
-        }
+        $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_email' => 'required|email|max:255',
+            'customer_phone' => 'nullable|string|max:20',
+            'customer_address' => 'nullable|string',
+            'notes' => 'nullable|string',
+            'payment_method' => 'required|in:cod,bank_transfer'
+        ]);
 
         $cart = session()->get('cart', []);
         if(empty($cart)) {
             return response()->json(['error' => 'Giỏ hàng của bạn đang trống!'], 400);
         }
-
-        $user = Auth::user();
 
         $total = 0;
         foreach($cart as $item) {
@@ -86,17 +89,18 @@ class OrderController extends Controller
         }
 
         try {
-            // Tạo đơn hàng với thông tin khách hàng từ user
+            // Tạo đơn hàng với thông tin khách hàng
             $order = Order::create([
-                'user_id'         => $user->id,
-                'customer_name'   => $user->name,
-                'customer_email'  => $user->email,
-                'customer_phone'  => $user->phone ?? '',
-                'customer_address'=> $user->address ?? '',
+                'user_id'         => Auth::check() ? Auth::id() : null,
+                'customer_name'   => $request->customer_name,
+                'customer_email'  => $request->customer_email,
+                'customer_phone'  => $request->customer_phone,
+                'customer_address'=> $request->customer_address,
                 'total_amount'    => $total,
                 'status'          => 'pending',
-                'payment_method'  => 'cod',
-                'notes'           => ''
+                'payment_method'  => $request->payment_method,
+                'payment_status'  => 'pending',
+                'notes'           => $request->notes
             ]);
 
             foreach($cart as $id => $item) {
@@ -125,7 +129,7 @@ class OrderController extends Controller
     // Hiển thị danh sách đơn hàng cho admin
     public function index()
     {
-        $orders = Order::with('items')->orderBy('created_at', 'desc')->paginate(10);
+        $orders = Order::with(['orderItems.product'])->orderBy('id', 'asc')->paginate(10);
         return view('orders.index', compact('orders'));
     }
 
@@ -204,6 +208,38 @@ class OrderController extends Controller
         return redirect()->route('admin.orders.show', $id)->with('success', 'Cập nhật trạng thái thành công!');
     }
 
+    // Cập nhật trạng thái đơn hàng
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled'
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update(['status' => $request->status]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật trạng thái thành công!'
+        ]);
+    }
+
+    // Cập nhật trạng thái thanh toán
+    public function updatePaymentStatus(Request $request, $id)
+    {
+        $request->validate([
+            'payment_status' => 'required|in:pending,paid,failed'
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update(['payment_status' => $request->payment_status]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Cập nhật trạng thái thanh toán thành công!'
+        ]);
+    }
+
     // Admin - Xóa đơn hàng
     public function adminDestroy($id)
     {
@@ -212,5 +248,47 @@ class OrderController extends Controller
         $order->delete();
 
         return redirect()->route('admin.orders.index')->with('success', 'Xóa đơn hàng thành công!');
+    }
+
+    // Xóa đơn hàng (cho admin)
+    public function delete($id)
+    {
+        try {
+            $order = Order::findOrFail($id);
+            
+            // Xóa các order items trước
+            $order->orderItems()->delete();
+            
+            // Xóa đơn hàng
+            $order->delete();
+
+            return redirect()->route('orders.index')->with('success', 'Xóa đơn hàng thành công!');
+        } catch (\Exception $e) {
+            return redirect()->route('orders.index')->with('error', 'Có lỗi xảy ra khi xóa đơn hàng!');
+        }
+    }
+
+    // Lấy thông tin đơn hàng để edit
+    public function edit($id)
+    {
+        $order = Order::findOrFail($id);
+        return view('orders.edit', compact('order'));
+    }
+
+    // Cập nhật đơn hàng
+    public function update(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
+            'payment_status' => 'required|in:pending,paid,failed'
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update([
+            'status' => $request->status,
+            'payment_status' => $request->payment_status
+        ]);
+
+        return redirect()->route('orders.index')->with('success', 'Cập nhật đơn hàng thành công!');
     }
 }

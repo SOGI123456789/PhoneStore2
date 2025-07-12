@@ -66,14 +66,14 @@
                 $allProducts = $allProducts->merge($child->products);
               }
               
-              // Lấy 6 sản phẩm đầu tiên
-              $displayProducts = $allProducts->take(8);
+              // Loại bỏ sản phẩm trùng lặp dựa trên ID và lấy 8 sản phẩm đầu tiên
+              $displayProducts = $allProducts->unique('id')->take(8);
             @endphp
             
             @if($displayProducts->count() > 0)
               @foreach($displayProducts as $product)
               <div class="col-xs-6 col-sm-6 col-md-3" style="margin-bottom: 20px;">
-                <div class="product-item" style="border: 1px solid #eee; border-radius: 5px; padding: 15px; background: white; text-align: center; height: 280px;">
+                <div class="product-item" style="border: 1px solid #eee; border-radius: 5px; padding: 15px; background: white; text-align: center; height: 320px;">
                   <div class="product-image" style="height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
                     @if($product->image_link)
                       <img src="{{ asset('storage/' . $product->image_link) }}" alt="{{ $product->name }}" style="max-width: 100px; max-height: 100px; object-fit: contain;">
@@ -84,6 +84,9 @@
                     @endif
                   </div>
                   <div class="product-info">
+                    <h5 style="margin-bottom: 8px; color: #333; font-size: 14px; font-weight: 600; height: 40px; overflow: hidden; line-height: 1.3;">
+                      {{ \Str::limit($product->name, 40) }}
+                    </h5>
                     <p style="margin-bottom: 10px; color: #e74c3c; font-weight: bold; font-size: 16px;">
                       <strong>Giá bán:</strong> {{ number_format($product->price, 0, ',', '.') }}đ
                     </p>
@@ -109,7 +112,7 @@
           @if($allProducts->count() > 8)
           <div style="text-align: right; margin-top: 15px;">
             <a href="#" class="btn" style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; padding: 10px 20px; border-radius: 5px; text-decoration: none; border: none;">
-              Xem tất cả <i class="fa fa-arrow-right"></i>
+              Xem tất cả ({{ $allProducts->unique('id')->count() }} sản phẩm) <i class="fa fa-arrow-right"></i>
             </a>
           </div>
           @endif

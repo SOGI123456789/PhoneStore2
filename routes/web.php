@@ -33,6 +33,10 @@ Route::prefix('orders')->name('orders.')->group(function () {
     Route::post('/create', [OrderController::class, 'createOrder'])->name('create');
     Route::get('/', [OrderController::class, 'index'])->name('index');
     Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+    Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('edit');
+    Route::post('/{id}/update', [OrderController::class, 'update'])->name('update');
+    Route::post('/{id}/status', [OrderController::class, 'updateStatus'])->name('update-status');
+    Route::post('/{id}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('update-payment-status');
 });
 
 // Place order routes
@@ -45,7 +49,7 @@ Route::prefix('admin/orders')->name('admin.orders.')->group(function () {
     Route::get('/', [OrderController::class, 'adminIndex'])->name('index');
     Route::get('/{id}', [OrderController::class, 'adminShow'])->name('show');
     Route::put('/{id}/status', [OrderController::class, 'updateStatus'])->name('update-status');
-    Route::delete('/{id}', [OrderController::class, 'destroy'])->name('destroy');
+    Route::delete('/{id}', [OrderController::class, 'delete'])->name('delete');
 });
 
 //  CATEGORIES ROUTES

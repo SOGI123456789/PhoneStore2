@@ -147,8 +147,47 @@
 
 			<!-- Shopping Cart Summary -->
 			<div class="row">
-				<div class="col-md-8"></div>
-				<div class="col-md-4">
+				<div class="col-md-5">
+					@if(count($cart) > 0)
+					<div class="customer-info">
+						<h3>Thông tin khách hàng</h3>
+						<form id="customerForm">
+							@csrf
+							<div class="form-group">
+								<label for="customer_name">Họ và tên *</label>
+								<input type="text" class="form-control" id="customer_name" name="customer_name" 
+									   value="{{ auth()->check() ? auth()->user()->name : '' }}" required>
+							</div>
+							<div class="form-group">
+								<label for="customer_email">Email *</label>
+								<input type="email" class="form-control" id="customer_email" name="customer_email" 
+									   value="{{ auth()->check() ? auth()->user()->email : '' }}" required>
+							</div>
+							<div class="form-group">
+								<label for="customer_phone">Số điện thoại</label>
+								<input type="text" class="form-control" id="customer_phone" name="customer_phone" 
+									   value="{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : '' }}">
+							</div>
+							<div class="form-group">
+								<label for="customer_address">Địa chỉ</label>
+								<textarea class="form-control" id="customer_address" name="customer_address" rows="3">{{ auth()->check() && auth()->user()->address ? auth()->user()->address : '' }}</textarea>
+							</div>
+							<div class="form-group">
+								<label for="notes">Ghi chú</label>
+								<textarea class="form-control" id="notes" name="notes" rows="2" placeholder="Ghi chú đơn hàng (không bắt buộc)"></textarea>
+							</div>
+							<div class="form-group">
+								<label for="payment_method">Phương thức thanh toán *</label>
+								<select class="form-control" id="payment_method" name="payment_method" required>
+									<option value="cod">Thanh toán khi nhận hàng (COD)</option>
+									<option value="bank_transfer">Chuyển khoản ngân hàng</option>
+								</select>
+							</div>
+						</form>
+					</div>
+					@endif
+				</div>
+				<div class="col-md-3">
 					<div class="cart-shopping-total">
 						<table class="table">
 							<thead>
@@ -330,33 +369,46 @@
 	}
 
 	function proceedToCheckout() {
-		// Kiểm tra xem người dùng đã đăng nhập chưa
-		@auth
-			// Nếu đã đăng nhập, tiến hành tạo đơn hàng
-			if(confirm('Bạn có chắc muốn gửi đơn hàng này?')) {
-				$.ajax({
-					url: '{{ route("orders.create") }}',
-					method: 'POST',
-					data: {
-						_token: $('meta[name="csrf-token"]').attr('content')
-					},
-					success: function(response) {
-						if(response.success) {
-							alert('Đơn hàng đã được tạo thành công!');
-							window.location.href = '{{ route("index") }}';
-						}
-					},
-					error: function(xhr) {
-						alert('Có lỗi xảy ra khi tạo đơn hàng!');
+		// Kiểm tra form thông tin khách hàng
+		var customerName = $('#customer_name').val();
+		var customerEmail = $('#customer_email').val();
+		
+		if(!customerName || !customerEmail) {
+			alert('Vui lòng nhập đầy đủ họ tên và email!');
+			return;
+		}
+		
+		// Lấy thông tin từ form
+		var customerData = {
+			customer_name: customerName,
+			customer_email: customerEmail,
+			customer_phone: $('#customer_phone').val(),
+			customer_address: $('#customer_address').val(),
+			notes: $('#notes').val(),
+			payment_method: $('#payment_method').val(),
+			_token: $('meta[name="csrf-token"]').attr('content')
+		};
+		
+		if(confirm('Bạn có chắc muốn gửi đơn hàng này?')) {
+			$.ajax({
+				url: '{{ route("orders.create") }}',
+				method: 'POST',
+				data: customerData,
+				success: function(response) {
+					if(response.success) {
+						alert('Đơn hàng đã được tạo thành công!');
+						window.location.href = '{{ route("index") }}';
 					}
-				});
-			}
-		@else
-			// Nếu chưa đăng nhập, chuyển đến trang đăng nhập
-			if(confirm('Bạn cần đăng nhập để gửi đơn hàng. Chuyển đến trang đăng nhập?')) {
-				window.location.href = '{{ route("login") }}';
-			}
-		@endauth
+				},
+				error: function(xhr) {
+					var errorMessage = 'Có lỗi xảy ra khi tạo đơn hàng!';
+					if(xhr.responseJSON && xhr.responseJSON.error) {
+						errorMessage = xhr.responseJSON.error;
+					}
+					alert(errorMessage);
+				}
+			});
+		}
 	}
 	</script>
 

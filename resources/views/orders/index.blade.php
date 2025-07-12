@@ -17,103 +17,108 @@
                             <table class="table table-bordered table-striped">
                                 <thead>
                                 <tr>
+                                    <th scope="col">STT</th>
                                     <th scope="col">ID Đơn hàng</th>
                                     <th scope="col">Tên người đặt</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Số điện thoại</th>
+                                    <th scope="col">Địa chỉ</th>
+                                    <th scope="col">Chi tiết đơn hàng</th>
                                     <th scope="col">Tổng tiền</th>
+                                    <th scope="col">Thanh toán</th>
                                     <th scope="col">Tình trạng</th>
-                                    <th scope="col">Chi tiết</th>
+                                    <th scope="col">Ngày đặt</th>
+                                    <th scope="col">Thao tác</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @forelse($orders as $order)
+                                @forelse($orders as $key => $order)
                                     <tr>
-                                        <td>#{{ $order->id }}</td>
+                                        <td>{{ ($orders->currentPage() - 1) * $orders->perPage() + $key + 1 }}</td>
+                                        <td>
+                                            <span class="badge badge-primary" style="font-size: 14px;">
+                                                #{{ $order->id }}
+                                            </span>
+                                        </td>
                                         <td>{{ $order->customer_name }}</td>
+                                        <td>{{ $order->customer_email }}</td>
+                                        <td>{{ $order->customer_phone ?: 'Không có' }}</td>
+                                        <td>{{ \Str::limit($order->customer_address, 30) ?: 'Không có' }}</td>
+                                        <td style="max-width: 200px;">
+                                            @if($order->orderItems && $order->orderItems->count() > 0)
+                                                <div style="max-height: 100px; overflow-y: auto;">
+                                                    @foreach($order->orderItems as $item)
+                                                        <div class="mb-1 p-1" style="font-size: 12px; border-bottom: 1px solid #eee;">
+                                                            <strong>{{ \Str::limit($item->product->name ?? 'Sản phẩm đã xóa', 25) }}</strong><br>
+                                                            <small class="text-muted">
+                                                                SL: {{ $item->quantity }} × {{ number_format($item->price, 0, ',', '.') }}đ
+                                                                = {{ number_format($item->quantity * $item->price, 0, ',', '.') }}đ
+                                                            </small>
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                                <small class="text-info">
+                                                    <strong>Tổng: {{ $order->orderItems->count() }} sản phẩm</strong>
+                                                </small>
+                                            @else
+                                                <span class="text-muted">Chưa có sản phẩm</span>
+                                            @endif
+                                        </td>
                                         <td>{{ number_format($order->total_amount, 0, ',', '.') }}đ</td>
                                         <td>
                                             <span class="badge 
-                                                @if($order->status == 'pending') badge-warning
-                                                @elseif($order->status == 'processing') badge-info
-                                                @elseif($order->status == 'shipped') badge-primary
-                                                @elseif($order->status == 'delivered') badge-success
-                                                @else badge-danger
+                                                @if($order->payment_method == 'cod') badge-info
+                                                @else badge-warning
                                                 @endif
                                             ">
-                                                @if($order->status == 'pending') Chờ xử lý
-                                                @elseif($order->status == 'processing') Đang xử lý
-                                                @elseif($order->status == 'shipped') Đã gửi hàng
-                                                @elseif($order->status == 'delivered') Đã giao hàng
-                                                @else Đã hủy
+                                                @if($order->payment_method == 'cod') 
+                                                    COD
+                                                @elseif($order->payment_method == 'bank_transfer') 
+                                                    Chuyển khoản
+                                                @else 
+                                                    {{ $order->payment_method }}
                                                 @endif
                                             </span>
+                                            <br>
+                                            <small class="text-muted">
+                                                @if($order->payment_status == 'pending') Chưa thanh toán
+                                                @elseif($order->payment_status == 'paid') Đã thanh toán
+                                                @else Thanh toán thất bại
+                                                @endif
+                                            </small>
                                         </td>
                                         <td>
-                                            <button class="btn btn-info btn-sm" onclick="toggleOrderDetails({{ $order->id }})">
-                                                <i class="fas fa-eye"></i> Xem chi tiết
-                                            </button>
+                                            <select class="form-control form-control-sm status-select" data-order-id="{{ $order->id }}">
+                                                <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
+                                                <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
+                                                <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Đang giao</option>
+                                                <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Đã giao</option>
+                                                <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
+                                            </select>
                                         </td>
-                                    </tr>
-                                    <!-- Chi tiết đơn hàng (ẩn mặc định) -->
-                                    <tr id="order-details-{{ $order->id }}" style="display: none;">
-                                        <td colspan="5">
-                                            <div class="card">
-                                                <div class="card-header">
-                                                    <h5>Chi tiết đơn hàng #{{ $order->id }}</h5>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        <div class="col-md-6">
-                                                            <h6><strong>Thông tin khách hàng:</strong></h6>
-                                                            <p><strong>Tên:</strong> {{ $order->customer_name }}</p>
-                                                            <p><strong>Email:</strong> {{ $order->customer_email }}</p>
-                                                            <p><strong>Số điện thoại:</strong> {{ $order->customer_phone }}</p>
-                                                            <p><strong>Địa chỉ:</strong> {{ $order->customer_address }}</p>
-                                                        </div>
-                                                        <div class="col-md-6">
-                                                            <h6><strong>Thông tin đơn hàng:</strong></h6>
-                                                            <p><strong>Ngày đặt:</strong> {{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i:s') }}</p>
-                                                            <p><strong>Tổng tiền:</strong> {{ number_format($order->total_amount, 0, ',', '.') }}đ</p>
-                                                            <p><strong>Ghi chú:</strong> {{ $order->notes ?? 'Không có ghi chú' }}</p>
-                                                        </div>
-                                                    </div>
-                                                    
-                                                    <h6><strong>Sản phẩm trong đơn hàng:</strong></h6>
-                                                    <div class="table-responsive">
-                                                        <table class="table table-sm">
-                                                            <thead>
-                                                                <tr>
-                                                                    <th>Sản phẩm</th>
-                                                                    <th>Số lượng</th>
-                                                                    <th>Giá</th>
-                                                                    <th>Tổng</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @if($order->orderItems)
-                                                                    @foreach($order->orderItems as $item)
-                                                                    <tr>
-                                                                        <td>{{ $item->product_name }}</td>
-                                                                        <td>{{ $item->quantity }}</td>
-                                                                        <td>{{ number_format($item->price, 0, ',', '.') }}đ</td>
-                                                                        <td>{{ number_format($item->total, 0, ',', '.') }}đ</td>
-                                                                    </tr>
-                                                                    @endforeach
-                                                                @endif
-                                                            </tbody>
-                                                        </table>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                        <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i') }}</td>
+                                        <td>
+                                            <a href="{{ route('orders.edit', ['id' => $order->id]) }}" class="btn btn-warning btn-sm">
+                                                <i class="fas fa-edit"></i> Sửa
+                                            </a>
+                                            <form action="{{ route('admin.orders.delete', ['id' => $order->id]) }}" method="POST" style="display:inline;" class="ml-1">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này? Hành động này không thể hoàn tác!')">
+                                                    <i class="fas fa-trash"></i> Xóa
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center">Chưa có đơn hàng nào</td>
+                                        <td colspan="12" class="text-center">Chưa có đơn hàng nào</td>
                                     </tr>
                                 @endforelse
                                 </tbody>
                             </table>
                         </div>
+                        
                         <div class="col-md-12">
                             @if($orders->hasPages())
                                 {{ $orders->links('pagination::bootstrap-4') }}
@@ -128,23 +133,4 @@
         <!-- /.content-wrapper -->
 
     @endsection
-
-    <script>
-    function toggleOrderDetails(orderId) {
-        const detailsRow = document.getElementById('order-details-' + orderId);
-        const button = event.target.closest('button');
-        
-        if (detailsRow.style.display === 'none') {
-            detailsRow.style.display = 'table-row';
-            button.innerHTML = '<i class="fas fa-eye-slash"></i> Ẩn chi tiết';
-            button.classList.remove('btn-info');
-            button.classList.add('btn-secondary');
-        } else {
-            detailsRow.style.display = 'none';
-            button.innerHTML = '<i class="fas fa-eye"></i> Xem chi tiết';
-            button.classList.remove('btn-secondary');
-            button.classList.add('btn-info');
-        }
-    }
-    </script>
 
