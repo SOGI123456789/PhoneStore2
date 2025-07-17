@@ -291,4 +291,19 @@ class OrderController extends Controller
 
         return redirect()->route('orders.index')->with('success', 'Cập nhật đơn hàng thành công!');
     }
+
+    // Hủy đơn hàng
+    public function cancelOrder($id)
+    {
+        $order = Auth::user()->orders()->where('id', $id)->firstOrFail();
+
+        // Chỉ cho phép hủy nếu đơn chưa giao hoặc chưa bị hủy
+        if (in_array($order->status, ['pending', 'processing'])) {
+            $order->status = 'cancelled';
+            $order->save();
+            return redirect()->back()->with('success', 'Đơn hàng đã được hủy thành công!');
+        }
+
+        return redirect()->back()->with('error', 'Không thể hủy đơn hàng này!');
+    }
 }

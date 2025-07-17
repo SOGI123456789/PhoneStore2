@@ -38,6 +38,7 @@ Route::prefix('orders')->name('orders.')->group(function () {
     Route::post('/{id}/update', [OrderController::class, 'update'])->name('update');
     Route::post('/{id}/status', [OrderController::class, 'updateStatus'])->name('update-status');
     Route::post('/{id}/payment-status', [OrderController::class, 'updatePaymentStatus'])->name('update-payment-status');
+    Route::post('/{id}/cancel', [OrderController::class, 'cancelOrder'])->name('cancel');
 });
 
 // Place order routes
@@ -105,6 +106,7 @@ Route::prefix('customer')->name('customer.')->middleware('auth')->group(function
     Route::get('/', [CustomerController::class, 'index'])->name('index');
     Route::get('/edit', [CustomerController::class, 'edit'])->name('edit');
     Route::post('/update', [CustomerController::class, 'update'])->name('update');
+    Route::get('/orders', [CustomerController::class, 'orders'])->name('orders');
 });
 
 Route::get('/', function () {
@@ -112,4 +114,4 @@ Route::get('/', function () {
 });
 // Product detail route
 Route::get('/product/{id}', [ProductController::class, 'detail'])->name('product.detail');
-Route::get('/category/{id}', [App\Http\Controllers\CategoryController::class, 'show'])->name('category.show');
+Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');

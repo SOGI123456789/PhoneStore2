@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-
+use App\Models\Order;
 class CustomerController extends Controller
 {
     // Bỏ constructor middleware
@@ -66,5 +66,15 @@ class CustomerController extends Controller
         $user->update($validated);
 
         return redirect()->route('customer.index')->with('success', 'Cập nhật thông tin thành công!');
+    }
+
+    // Hiển thị đơn hàng của khách hàng
+    public function orders()
+    {
+        $orders = Order::with('orderItems')
+            ->where('user_id', Auth::id())
+            ->orderBy('created_at', 'desc')
+            ->get();
+        return view('customer.orders', compact('orders'));
     }
 }

@@ -8,7 +8,6 @@
             <li><a href="#"><i class="fas fa-map-marker-alt"></i> Hệ thống 50 cửa hàng</a></li>
             <li><a href="#"><i class="fa fa-envelope-open-o"></i> Chính sách bảo hành & đổi trả</a></li>
             <li><a href="#"><i class="fa fa-comment"></i> Góp ý & phản hồi</a></li>
-            <li><a href="#"><i class="fas fa-box"></i> Theo dõi đơn hàng</a></li>
             @auth
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -17,7 +16,7 @@
                 <ul class="dropdown-menu">
                   <li><a href="{{ route('customer.index') }}"><i class="fa fa-user"></i> Thông tin cá nhân</a></li>
                   <li><a href="{{ route('customer.edit') }}"><i class="fa fa-edit"></i> Chỉnh sửa thông tin</a></li>
-                  <li><a href="#"><i class="fa fa-shopping-bag"></i> Đơn hàng của tôi</a></li>
+                  <li><a href="{{ route('customer.orders') }}"><i class="fa fa-shopping-bag"></i> Đơn hàng của tôi</a></li>
                   <li role="separator" class="divider"></li>
                   <li>
                     <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
@@ -35,19 +34,7 @@
           </ul>
         </div>
         <!-- /.cnt-account -->
-        
-        <div class="cnt-block">
-          <ul class="list-unstyled list-inline">
-            <li class="dropdown dropdown-small"> <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><span class="value">VietNamese </span><b class="caret"></b></a>
-              <ul class="dropdown-menu">
-                <li><a href="#">VietNamese</a></li>
-                <li><a href="#">French</a></li>
-                <li><a href="#">English</a></li>
-              </ul>
-            </li>
-          </ul>
-          <!-- /.list-unstyled --> 
-        </div>
+       
         <!-- /.cnt-cart -->
         <div class="clearfix"></div>
       </div>
@@ -62,7 +49,11 @@
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-3 logo-holder"> 
           <!-- ============================================================= LOGO ============================================================= -->
-          <div class="logo"> <a href="home"> <img src="assets/images/logo_fnn.png" alt="logo"> </a> </div>
+          <div class="logo"> 
+            <a href="{{ url('/') }}">
+                <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" style="height:50px;">
+            </a>
+          </div>
           <!-- /.logo --> 
           <!-- ============================================================= LOGO : END ============================================================= --> </div>
         <!-- /.logo-holder -->
@@ -84,13 +75,15 @@
         
         <div class="col-xs-12 col-sm-12 col-md-1 animate-dropdown top-cart-row"> 
           <!-- ============================================================= SHOPPING CART LINK ============================================================= -->
-          
+         
           <div class="cart-link"> 
             <a href="{{ route('shopping-cart') }}" class="lnk-cart">
-              <div class="items-cart-inner">
-                <div class="basket"><i class="fas fa-shopping-cart" style="font-size:26px;color:white"></i></div>
-                <div class="basket-item-count"><span class="count">{{ count(session()->get('cart', [])) }}</span></div>
-              </div>
+                <div class="items-cart-inner">
+                    <div class="basket">
+                        <img src="{{ asset('assets/images/shopping-cart.png') }}" alt="Giỏ hàng" style="height:26px;">
+                    </div>
+                    
+                </div>
             </a>
           </div>
           
@@ -99,7 +92,7 @@
         <div class="col-xs-12 col-sm-12 col-md-2 complain"> 
           <!-- ============================================================= COMPLAIN ============================================================= -->
           <div class="complain"> 
-            <a href="home"><i class='fas fa-comments' style='font-size:30px;color:white'></i></a>
+            
             <div class="content-complain">
               <span class="text-complain">Khiếu nại</br></span>
               <span class="phone-complain">0123456789</span>
@@ -154,14 +147,14 @@
           <div class="navbar-collapse collapse" id="mc-horizontal-menu-collapse">
             <div class="nav-outer">
               <ul class="nav navbar-nav">
-                <li class="active dropdown yamm-fw"> <a href="home" data-hover="dropdown" class="dropdown-toggle" data-toggle="dropdown">Home</a> </li>
+                <li class="active dropdown yamm-fw"> <a href="{{ url('/') }}" >Home</a> </li>
                 
                 @foreach($parentCategories as $parentCategory)
                 <li class="dropdown yamm mega-menu"> 
                   <a href="#" data-hover="dropdown" class="dropdown-toggle" data-toggle="dropdown">
                     {{ $parentCategory->name }}
                     @if($parentCategory->children->count() > 0)
-                    <span class="menu-label hot-menu hidden-xs">hot</span>
+                  
                     @endif
                   </a>
                   
@@ -177,7 +170,7 @@
                             <ul class="links">
                               @if($childCategory->products->count() > 0)
                                 @foreach($childCategory->products->take(5) as $product)
-                                <li><a href="#">{{ $product->name }}</a></li>
+                                <li><a href="{{ route('product.detail', ['id' => $product->id]) }}">{{ $product->name }}</a></li>
                                 @endforeach
                               @else
                                 <li><a href="#">Đang cập nhật...</a></li>
@@ -199,7 +192,7 @@
                 @endforeach
                 
                 
-                <li class="dropdown  navbar-right special-menu"> <a href="#">Todays offer</a> </li>
+               
               </ul>
               <!-- /.navbar-nav -->
               <div class="clearfix"></div>
@@ -243,5 +236,10 @@
     height: 1px;
     margin: 5px 0;
     background: #e5e5e5;
+}
+
+.basket img {
+    margin-top: 8px;
+    margin-left: 8px;
 }
 </style>

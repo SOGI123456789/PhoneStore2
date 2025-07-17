@@ -76,14 +76,17 @@
 									<p>{{ $product->description }}</p>
 								@endif
 							</div>
-							<!-- Ô nhập số lượng -->
-							<div style="margin-bottom: 15px;">
-								<label for="quantity" style="font-weight:500;">Số lượng:</label>
-								<input type="number" id="quantity" name="quantity" value="1" min="1" style="width:70px; padding:5px; border-radius:4px; border:1px solid #ccc;">
-							</div>
-							<a href="#" class="btn btn-primary" style="background: linear-gradient(45deg, #e74c3c, #c0392b); border:none; border-radius:5px; padding:10px 30px; font-size:18px;">
-								Mua ngay
-							</a>
+							<form action="{{ route('cart.add') }}" method="POST" style="display:inline;">
+    @csrf
+    <div style="margin-bottom: 15px;">
+        <label for="quantity" style="font-weight:500;">Số lượng:</label>
+        <input type="number" id="quantity" name="quantity" value="1" min="1" style="width:70px; padding:5px; border-radius:4px; border:1px solid #ccc;">
+    </div>
+    <input type="hidden" name="product_id" value="{{ $product->id }}">
+    <button type="submit" class="btn btn-primary" style="background: linear-gradient(45deg, #e74c3c, #c0392b); border:none; border-radius:5px; padding:10px 30px; font-size:18px;">
+        Mua ngay
+    </button>
+</form>
 						</div>
 					</div>
 

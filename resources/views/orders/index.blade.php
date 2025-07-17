@@ -88,25 +88,31 @@
                                             </small>
                                         </td>
                                         <td>
-                                            <select class="form-control form-control-sm status-select" data-order-id="{{ $order->id }}">
-                                                <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Chờ xử lý</option>
-                                                <option value="processing" {{ $order->status == 'processing' ? 'selected' : '' }}>Đang xử lý</option>
-                                                <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Đang giao</option>
-                                                <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Đã giao</option>
-                                                <option value="cancelled" {{ $order->status == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
-                                            </select>
+                                            <span class="badge
+                                                @if($order->status == 'pending') badge-secondary
+                                                @elseif($order->status == 'processing') badge-info
+                                                @elseif($order->status == 'shipped') badge-primary
+                                                @elseif($order->status == 'delivered') badge-success
+                                                @elseif($order->status == 'cancelled') badge-danger
+                                                @else badge-light
+                                                @endif
+                                            ">
+                                                @if($order->status == 'pending') Chờ xử lý
+                                                @elseif($order->status == 'processing') Đang xử lý
+                                                @elseif($order->status == 'shipped') Đang giao
+                                                @elseif($order->status == 'delivered') Đã giao
+                                                @elseif($order->status == 'cancelled') Đã hủy
+                                                @else {{ ucfirst($order->status) }}
+                                                @endif
+                                            </span>
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i') }}</td>
                                         <td>
-                                            <a href="{{ route('orders.edit', ['id' => $order->id]) }}" class="btn btn-warning btn-sm">
-                                                <i class="fas fa-edit"></i> Sửa
-                                            </a>
-                                            <form action="{{ route('admin.orders.delete', ['id' => $order->id]) }}" method="POST" style="display:inline;" class="ml-1">
+                                              <a href="{{ route('orders.edit', ['id' => $order->id]) }}" class="btn btn-default btn-sm">Sửa</a>
+                                            <form action="{{ route('admin.orders.delete', ['id' => $order->id]) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này? Hành động này không thể hoàn tác!')">
-                                                    <i class="fas fa-trash"></i> Xóa
-                                                </button>
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa?')">Xóa</button>
                                             </form>
                                         </td>
                                     </tr>

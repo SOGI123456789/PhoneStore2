@@ -27,7 +27,7 @@
                                 <td>{{ $user->email }}</td>
                                 <td>{{ $user->role ? $user->role->name : 'Chưa phân quyền' }}</td>
                                 <td>
-                                    <a href="{{ route('roles.edit', ['id' => $user->id]) }}" class="btn btn-primary btn-sm">Sửa</a>
+                                    <a href="{{ route('roles.edit', ['id' => $user->id]) }}" class="btn btn-default btn-sm">Sửa</a>
                                     <form action="{{ route('roles.delete', ['id' => $user->id]) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')

@@ -23,11 +23,11 @@ class CartController extends Controller
     {
         $productId = $request->product_id;
         $quantity = $request->quantity ?? 1;
-        
+
         $product = Product::findOrFail($productId);
-        
+
         $cart = session()->get('cart', []);
-        
+
         if(isset($cart[$productId])) {
             $cart[$productId]['quantity'] += $quantity;
         } else {
@@ -39,14 +39,10 @@ class CartController extends Controller
                 'quantity' => $quantity
             ];
         }
-        
+
         session()->put('cart', $cart);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Sản phẩm đã được thêm vào giỏ hàng!',
-            'cart_count' => count($cart)
-        ]);
+
+        return redirect()->route('index')->with('success', 'Sản phẩm đã được thêm vào giỏ hàng!');
     }
 
     public function updateCart(Request $request)

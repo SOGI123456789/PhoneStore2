@@ -14,7 +14,6 @@
 <!-- Bootstrap Core CSS -->
 <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
 
-<!-- Customizable CSS -->
 <link rel="stylesheet" href="{{asset('assets/css/main.css')}}">
 <link rel="stylesheet" href="{{asset('assets/css/blue.css')}}">
 <link rel="stylesheet" href="{{asset('assets/css/owl.carousel.css')}}">
@@ -94,9 +93,14 @@
                       <a href="{{ route('product.detail', $product->id) }}" class="btn btn-primary" style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 5px; flex: 1;">
                         Xem ngay
                       </a>
-                      <button onclick="addToCart({{ $product->id }})" class="btn btn-success" style="background: linear-gradient(45deg, #27ae60, #229954); color: white; border: none; border-radius: 5px; flex: 1;">
-                        <i class="fa fa-cart-plus"></i> Thêm
-                      </button>
+                      <form action="{{ route('cart.add') }}" method="POST" style="display:inline;">
+                        @csrf
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <button type="submit" class="btn btn-success" style="background: linear-gradient(45deg, #27ae60, #229954); color: white; border: none; border-radius: 5px; flex: 1;">
+                          <i class="fa fa-cart-plus"></i> Thêm
+                        </button>
+                      </form>
                     </div>
                   </div>
                 </div>
@@ -147,34 +151,21 @@
 <script src="{{asset('assets/js/script_k.js')}}"></script>
 <script src="{{asset('assets/js/do.js')}}"></script>
 
+@if(session('success'))
+<div class="alert alert-success alert-dismissible fade in position-fixed" role="alert" id="toast-success"
+     style="z-index: 9999; min-width: 250px; position: fixed; bottom: 30px; right: 30px;">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">&times;</button>
+    {{ session('success') }}
+</div>
 <script>
-function addToCart(productId) {
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        }
-    });
-    
-    $.ajax({
-        url: '{{ route("cart.add") }}',
-        method: 'POST',
-        data: {
-            product_id: productId,
-            quantity: 1
-        },
-        success: function(response) {
-            if(response.success) {
-                // Hiển thị thông báo thành công
-                alert(response.message);
-                // Cập nhật số lượng giỏ hàng
-                $('.basket-item-count .count').text(response.cart_count);
-            }
-        },
-        error: function(xhr) {
-            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
-        }
-    });
-}
+    setTimeout(function() {
+        $('#toast-success').alert('close');
+    }, 3000);
+</script>
+@endif
+
+<script>
+
 </script>
 </body>
 </html>

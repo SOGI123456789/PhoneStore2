@@ -11,7 +11,7 @@ class User extends Authenticatable
     protected $keyType = 'int';
 
     protected $fillable = [
-        'name', // Thêm dòng này
+        'name',
         'username', 'email', 'password', 'phone','address', 'role_id'
     ];
 
@@ -20,5 +20,10 @@ class User extends Authenticatable
     public function role()
     {
         return $this->belongsTo(Role::class, 'role_id', 'id');
+    }
+    
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Order::class, 'user_id', 'id');
     }
 }
