@@ -64,10 +64,11 @@
           <div class="search-area">
             <form action="{{ route('search') }}" method="GET">
               <div class="control-group">
-                <input class="search-field" name="q" placeholder="Bạn cần tìm gì..." value="{{ request('q') }}" required>
+                <input class="search-field" name="q" placeholder="Bạn cần tìm gì..." value="{{ request('q') }}" 
+                       id="searchInput" autocomplete="off" required>
                 <button type="submit" class="search-button">
-                  <i class="fa fa-search"></i>
                 </button>
+                <div id="searchSuggestions" class="search-suggestions"></div>
               </div>
             </form>
           </div>
@@ -243,5 +244,105 @@
 .basket img {
     margin-top: 8px;
     margin-left: 8px;
+}
+.search-area {
+    position: relative;
+}
+
+.search-area {
+    position: relative;
+}
+
+.control-group {
+    position: relative;
+    width: 100%;
+}
+
+.search-field {
+    width: 100%;
+    padding-right: 50px;
+    height: 40px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding-left: 15px;
+}
+
+.search-button {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    color: #666;
+    height: 30px;
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.search-button:hover {
+    color: #333;
+    background: #f5f5f5;
+    border-radius: 3px;
+}
+
+.search-button i {
+    font-size: 16px;
+}
+
+/* Search suggestions dropdown */
+.search-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 9999 !important;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+.search-suggestion-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f5f5f5;
+    display: flex;
+    align-items: center;
+}
+
+.search-suggestion-item:hover {
+    background: #f8f9fa;
+}
+
+.search-suggestion-item.active {
+    background: #e3f2fd;
+}
+
+.search-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.search-suggestion-item .suggestion-icon {
+    margin-right: 10px;
+    color: #666;
+}
+
+.search-suggestion-item .suggestion-text {
+    flex: 1;
+}
+
+.search-suggestion-item .suggestion-type {
+    font-size: 12px;
+    color: #999;
+    margin-left: 10px;
 }
 </style>

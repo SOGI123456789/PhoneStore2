@@ -163,6 +163,23 @@
                                     </ul>
                                 </div>
                             @endif
+
+                            @if($review->images && count($review->images) > 0)
+                                <div class="review-images" style="margin-top: 15px;">
+                                    <strong><i class="fa fa-camera"></i> Hình ảnh từ khách hàng:</strong>
+                                    <div class="review-images-gallery" style="margin-top: 10px;">
+                                        @foreach($review->images as $image)
+                                            <div class="review-image-item" style="display: inline-block; margin-right: 10px; margin-bottom: 10px;">
+                                                <img src="{{ asset('storage/' . $image) }}" 
+                                                     alt="Review Image" 
+                                                     class="img-thumbnail review-image-thumb" 
+                                                     style="width: 80px; height: 80px; object-fit: cover; cursor: pointer;"
+                                                     onclick="openImageModal('{{ asset('storage/' . $image) }}')">
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                         
                         <!-- REVIEW ACTIONS -->
@@ -339,4 +356,32 @@ $(document).ready(function() {
         });
     });
 });
+
+// Image modal function
+function openImageModal(imageSrc) {
+    // Create modal if not exists
+    if (!document.getElementById('imageModal')) {
+        var modal = document.createElement('div');
+        modal.id = 'imageModal';
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Hình ảnh đánh giá</h4>
+                    </div>
+                    <div class="modal-body text-center">
+                        <img id="modalImage" src="" class="img-responsive" style="max-width: 100%; max-height: 500px;">
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    
+    // Set image source and show modal
+    document.getElementById('modalImage').src = imageSrc;
+    $('#imageModal').modal('show');
+}
 </script>

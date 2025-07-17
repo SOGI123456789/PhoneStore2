@@ -63,12 +63,25 @@ class SearchController extends Controller
             return response()->json([]);
         }
 
-        $suggestions = Product::where('name', 'like', '%' . $query . '%')
-            ->limit(8)
+        // Tìm kiếm sản phẩm theo tên
+        $productSuggestions = Product::where('name', 'like', '%' . $query . '%')
+            ->limit(6)
             ->pluck('name')
             ->unique()
             ->values();
 
-        return response()->json($suggestions);
+        // Tìm kiếm theo danh mục
+        $categorySuggestions = Category::where('name', 'like', '%' . $query . '%')
+            ->where('parent_id', '!=', 0)
+            ->limit(3)
+            ->pluck('name')
+            ->map(function($name) {
+                return $name . ' (Danh mục)';
+            });
+
+        // Kết hợp và giới hạn kết quả
+        $allSuggestions = $productSuggestions->concat($categorySuggestions)->take(8);
+
+        return response()->json($allSuggestions->values());
     }
 }

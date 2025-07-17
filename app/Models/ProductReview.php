@@ -20,11 +20,13 @@ class ProductReview extends Model
         'pros',
         'cons',
         'reviewer_name',
+        'images',
     ];
 
     protected $casts = [
         'pros' => 'array',
         'cons' => 'array',
+        'images' => 'array',
         'is_verified' => 'boolean',
         'is_approved' => 'boolean',
     ];

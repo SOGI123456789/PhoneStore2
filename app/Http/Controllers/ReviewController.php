@@ -18,7 +18,9 @@ class ReviewController extends Controller
         $product = Product::findOrFail($productId);
         
         // Khởi tạo query
-        $query = ProductReview::where('product_id', $productId);
+        $query = ProductReview::where('product_id', $productId)
+            ->where('is_approved', true)
+            ->with('user');
         
         // Lọc theo rating
         if ($request->filled('rating')) {
@@ -42,21 +44,21 @@ class ReviewController extends Controller
         
         switch ($sortBy) {
             case 'oldest':
-                $query->oldest();
+                $query->orderBy('created_at', 'asc');
                 break;
             case 'highest_rating':
-                $query->orderBy('rating', 'desc')->latest();
+                $query->orderBy('rating', 'desc')->orderBy('created_at', 'desc');
                 break;
             case 'lowest_rating':
-                $query->orderBy('rating', 'asc')->latest();
+                $query->orderBy('rating', 'asc')->orderBy('created_at', 'desc');
                 break;
             default: // newest
-                $query->latest();
+                $query->orderBy('created_at', 'desc');
                 break;
         }
         
         // Phân trang
-        $reviews = $query->with('user')->paginate(10);
+        $reviews = $query->paginate(10);
         
         return view('reviews.index', compact('product', 'reviews', 'sortBy'));
     }
@@ -102,11 +104,8 @@ class ReviewController extends Controller
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'review' => 'nullable|string|max:1000',
-            'pros' => 'nullable|array',
-            'pros.*' => 'string|max:100',
-            'cons' => 'nullable|array', 
-            'cons.*' => 'string|max:100',
-            'reviewer_name' => 'nullable|string|max:50'
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
         ]);
 
         $product = Product::findOrFail($productId);
@@ -129,6 +128,17 @@ class ReviewController extends Controller
             ->first();
 
         DB::transaction(function() use ($request, $productId, $user, $orderItem) {
+            // Upload images if any
+            $imagePaths = null;
+            if ($request->hasFile('images')) {
+                $imagePaths = [];
+                foreach ($request->file('images') as $image) {
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $path = $image->storeAs('reviews', $filename, 'public');
+                    $imagePaths[] = $path;
+                }
+            }
+
             // Tạo review
             ProductReview::create([
                 'product_id' => $productId,
@@ -137,9 +147,8 @@ class ReviewController extends Controller
                 'rating' => $request->rating,
                 'review' => $request->review,
                 'is_verified' => $orderItem ? true : false,
-                'pros' => $request->pros ? array_filter($request->pros) : null,
-                'cons' => $request->cons ? array_filter($request->cons) : null,
-                'reviewer_name' => $request->reviewer_name ?: null,
+                'images' => $imagePaths,
+                'reviewer_name' => $user->name,
             ]);
 
             // Cập nhật rating cho product
@@ -160,13 +169,16 @@ class ReviewController extends Controller
 
         $review = ProductReview::where('id', $reviewId)
             ->where('user_id', $user->id)
+            ->with('product')
             ->firstOrFail();
 
         if (!$review->canEdit($user->id)) {
             return back()->with('error', 'Bạn chỉ có thể chỉnh sửa đánh giá trong vòng 24 giờ');
         }
 
-        return view('reviews.edit', compact('review'));
+        $product = $review->product;
+
+        return view('reviews.edit', compact('review', 'product'));
     }
 
     // Cập nhật đánh giá
@@ -180,10 +192,10 @@ class ReviewController extends Controller
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
             'review' => 'nullable|string|max:1000',
-            'pros' => 'nullable|array',
-            'pros.*' => 'string|max:100',
-            'cons' => 'nullable|array',
-            'cons.*' => 'string|max:100',
+            'existing_images' => 'nullable|array',
+            'existing_images.*' => 'string',
+            'new_images' => 'nullable|array|max:5',
+            'new_images.*' => 'image|mimes:jpeg,png,jpg,gif|max:5120', // 5MB
         ]);
 
         $review = ProductReview::where('id', $reviewId)
@@ -195,11 +207,29 @@ class ReviewController extends Controller
         }
 
         DB::transaction(function() use ($request, $review) {
+            // Xử lý hình ảnh
+            $existingImages = $request->existing_images ?? [];
+            $newImages = [];
+
+            // Upload new images
+            if ($request->hasFile('new_images')) {
+                foreach ($request->file('new_images') as $image) {
+                    $filename = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
+                    $path = $image->storeAs('reviews', $filename, 'public');
+                    $newImages[] = $path;
+                }
+            }
+
+            // Combine existing and new images
+            $allImages = array_merge($existingImages, $newImages);
+            
+            // Limit to 5 images total
+            $allImages = array_slice($allImages, 0, 5);
+
             $review->update([
                 'rating' => $request->rating,
                 'review' => $request->review,
-                'pros' => $request->pros ? array_filter($request->pros) : null,
-                'cons' => $request->cons ? array_filter($request->cons) : null,
+                'images' => !empty($allImages) ? $allImages : null,
             ]);
 
             // Cập nhật lại rating cho product
@@ -233,47 +263,7 @@ class ReviewController extends Controller
             ->with('success', 'Đánh giá đã được xóa');
     }
 
-    // Hiển thị tất cả đánh giá của sản phẩm
-    public function index($productId, Request $request)
-    {
-        $product = Product::findOrFail($productId);
-        
-        $query = ProductReview::where('product_id', $productId)
-            ->where('is_approved', true)
-            ->with('user');
 
-        // Lọc theo rating
-        if ($request->rating) {
-            $query->where('rating', $request->rating);
-        }
-
-        // Lọc theo loại đánh giá
-        if ($request->filter == 'verified') {
-            $query->where('is_verified', true);
-        } elseif ($request->filter == 'with_review') {
-            $query->whereNotNull('review');
-        }
-
-        // Sắp xếp
-        $sortBy = $request->sort_by ?? 'newest';
-        switch ($sortBy) {
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'highest_rating':
-                $query->orderBy('rating', 'desc');
-                break;
-            case 'lowest_rating':
-                $query->orderBy('rating', 'asc');
-                break;
-            default: // newest
-                $query->orderBy('created_at', 'desc');
-        }
-
-        $reviews = $query->paginate(10);
-
-        return view('reviews.index', compact('product', 'reviews', 'sortBy'));
-    }
 
     // Cập nhật rating trung bình cho product
     private function updateProductRating($productId)
