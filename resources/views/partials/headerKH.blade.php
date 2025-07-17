@@ -62,10 +62,12 @@
           <!-- /.contact-row --> 
           <!-- ============================================================= SEARCH AREA ============================================================= -->
           <div class="search-area">
-            <form>
+            <form action="{{ route('search') }}" method="GET">
               <div class="control-group">
-                <input class="search-field" placeholder="Bạn cần tìm gì...">
-                <a class="search-button" href="#"></a>
+                <input class="search-field" name="q" placeholder="Bạn cần tìm gì..." value="{{ request('q') }}" required>
+                <button type="submit" class="search-button">
+                  <i class="fa fa-search"></i>
+                </button>
               </div>
             </form>
           </div>

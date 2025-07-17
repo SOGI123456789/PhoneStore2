@@ -10,6 +10,8 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -115,3 +117,19 @@ Route::get('/', function () {
 // Product detail route
 Route::get('/product/{id}', [ProductController::class, 'detail'])->name('product.detail');
 Route::get('/category/{id}', [CategoryController::class, 'show'])->name('category.show');
+
+// Search routes
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+
+// Review routes
+Route::middleware('auth')->group(function () {
+    Route::get('/product/{id}/review/create', [ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/product/{id}/review', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::get('/review/{id}/edit', [ReviewController::class, 'edit'])->name('reviews.edit');
+    Route::put('/review/{id}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/review/{id}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('/reviews/{id}/helpful', [ReviewController::class, 'helpful'])->name('reviews.helpful');
+});
+
+Route::get('/product/{id}/reviews', [ReviewController::class, 'index'])->name('reviews.index');

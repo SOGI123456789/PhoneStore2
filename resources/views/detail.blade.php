@@ -9,6 +9,7 @@
 	<meta name="author" content="">
 	<meta name="keywords" content="MediaCenter, Template, eCommerce">
 	<meta name="robots" content="all">
+	<meta name="csrf-token" content="{{ csrf_token() }}">
 	<title>Flipmart premium HTML5 & CSS3 Template</title>
 
 	<!-- Bootstrap Core CSS -->
@@ -24,6 +25,7 @@
 	<link rel="stylesheet" href="{{ asset('assets/css/bootstrap-select.min.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/do.css') }}">
 	<link rel="stylesheet" href="{{ asset('assets/css/lightbox.css') }}">
+	<link rel="stylesheet" href="{{ asset('assets/css/reviews.css') }}">
 
 	<!-- Icons/Glyphs -->
 	<link rel="stylesheet" href="assets\css\font-awesome.css">
@@ -118,6 +120,11 @@
 				<!-- KẾT THÚC PHẦN CHI TIẾT SẢN PHẨM -->
 			</div>
 		</div>
+		
+		<!-- PRODUCT REVIEWS SECTION -->
+		@include('partials.product-reviews')
+		<!-- END PRODUCT REVIEWS SECTION -->
+		
 	</div>
 	@include('partials.footerKH')
 	<!-- ============================================================= FOOTER : END============================================================= -->
@@ -142,6 +149,7 @@
 <script src="{{ asset('assets/js/wow.min.js') }}"></script>
 <script src="{{ asset('assets/js/scripts.js') }}"></script>
 <script src="{{ asset('assets/js/do.js') }}"></script>
+<script src="{{ asset('assets/js/reviews.js') }}"></script>
 
 </body>
 
