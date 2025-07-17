@@ -12,7 +12,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', // Thêm dòng này
-        'username', 'email', 'password', 'phone', 'role_id'
+        'username', 'email', 'password', 'phone','address', 'role_id'
     ];
 
     public $timestamps = false;

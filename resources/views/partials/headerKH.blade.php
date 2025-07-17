@@ -5,20 +5,29 @@
       <div class="header-top-inner">
         <div class="cnt-account">
           <ul class="list-unstyled">
-            <li><a href="#"><i class="fa fa-download"></i> Tải app</a></li>
             <li><a href="#"><i class="fas fa-map-marker-alt"></i> Hệ thống 50 cửa hàng</a></li>
             <li><a href="#"><i class="fa fa-envelope-open-o"></i> Chính sách bảo hành & đổi trả</a></li>
             <li><a href="#"><i class="fa fa-comment"></i> Góp ý & phản hồi</a></li>
             <li><a href="#"><i class="fas fa-box"></i> Theo dõi đơn hàng</a></li>
             @auth
-              <li><a href="#"><i class="icon fa fa-user"></i> Xin chào, {{ Auth::user()->name }}</a></li>
-              <li>
-                <form action="{{ route('logout') }}" method="POST" style="display: inline;">
-                  @csrf
-                  <button type="submit" style="background: none; border: none; color: white; cursor: pointer; padding: 0;">
-                    <i class="icon fa fa-sign-out"></i> Đăng xuất
-                  </button>
-                </form>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                  <i class="icon fa fa-user"></i> {{ Auth::user()->name }} <span class="caret"></span>
+                </a>
+                <ul class="dropdown-menu">
+                  <li><a href="{{ route('customer.index') }}"><i class="fa fa-user"></i> Thông tin cá nhân</a></li>
+                  <li><a href="{{ route('customer.edit') }}"><i class="fa fa-edit"></i> Chỉnh sửa thông tin</a></li>
+                  <li><a href="#"><i class="fa fa-shopping-bag"></i> Đơn hàng của tôi</a></li>
+                  <li role="separator" class="divider"></li>
+                  <li>
+                    <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                      <i class="fa fa-sign-out"></i> Đăng xuất
+                    </a>
+                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                      @csrf
+                    </form>
+                  </li>
+                </ul>
               </li>
             @else
               <li><a href="{{ route('login') }}"><i class="icon fa fa-user"></i> Đăng ký/Đăng nhập</a></li>
@@ -189,35 +198,7 @@
                 </li>
                 @endforeach
                 
-                <li class="dropdown"> <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown">Pages</a>
-                  <ul class="dropdown-menu pages">
-                    <li>
-                      <div class="yamm-content">
-                        <div class="row">
-                          <div class="col-xs-12 col-menu">
-                            <ul class="links">
-                              <li><a href="home">Home</a></li>
-                              <li><a href="category">Category</a></li>
-                              <li><a href="detail">Detail</a></li>
-                              <li><a href="shopping-cart">Shopping Cart Summary</a></li>
-                              <li><a href="checkout">Checkout</a></li>
-                              <li><a href="blog">Blog</a></li>
-                              <li><a href="blog-details">Blog Detail</a></li>
-                              <li><a href="contact">Contact</a></li>
-                              <li><a href="sign-in">Sign In</a></li>
-                              <li><a href="my-wishlist">Wishlist</a></li>
-                              <li><a href="terms-conditions">Terms and Condition</a></li>
-                              <li><a href="track-orders">Track Orders</a></li>
-                              <li><a href="product-comparison">Product-Comparison</a></li>
-                              <li><a href="faq">FAQ</a></li>
-                              <li><a href="404">404</a></li>
-                            </ul>
-                          </div>
-                        </div>
-                      </div>
-                    </li>
-                  </ul>
-                </li>
+                
                 <li class="dropdown  navbar-right special-menu"> <a href="#">Todays offer</a> </li>
               </ul>
               <!-- /.navbar-nav -->
@@ -239,3 +220,28 @@
   <!-- ============================================== NAVBAR : END ============================================== --> 
   
 </header>
+<style>
+.dropdown-menu {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.dropdown-menu li a {
+    color: #333 !important;
+    padding: 8px 15px;
+    display: block;
+}
+
+.dropdown-menu li a:hover {
+    background: #f5f5f5;
+    color: #333 !important;
+}
+
+.dropdown-menu .divider {
+    height: 1px;
+    margin: 5px 0;
+    background: #e5e5e5;
+}
+</style>

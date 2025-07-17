@@ -9,6 +9,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\CustomerController;
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -97,6 +98,13 @@ Route::prefix('roles')->name('roles.')->group(function () {
     Route::get('/edit/{id}', [RoleController::class, 'edit'])->name('edit');
     Route::post('/update/{id}', [RoleController::class, 'update'])->name('update');
     Route::delete('/delete/{id}', [RoleController::class, 'delete'])->name('delete');
+});
+
+// Customer routes với middleware auth
+Route::prefix('customer')->name('customer.')->middleware('auth')->group(function () {
+    Route::get('/', [CustomerController::class, 'index'])->name('index');
+    Route::get('/edit', [CustomerController::class, 'edit'])->name('edit');
+    Route::post('/update', [CustomerController::class, 'update'])->name('update');
 });
 
 Route::get('/', function () {
