@@ -24,14 +24,16 @@ class ProductController extends Controller
             'name' => 'required',
             'catalog_id' => 'required|integer',
             'content' => 'nullable|string',
-            'price' => 'required|numeric',
-            'discount_price' => 'nullable|numeric',
+            'price' => 'required|numeric|min:0',
             'image_link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Sửa dòng này
             'viewer' => 'nullable|integer',
             'buyed' => 'nullable|integer',
             'rate_total' => 'nullable|integer',
             'rate_count' => 'nullable|integer',
             'quantity' => 'required|integer|min:0',
+        ], [
+            'price.min' => 'Giá sản phẩm không được là số âm',
+            'quantity.min' => 'Số lượng không được là số âm',
         ]);
         $data = $request->all();
 
@@ -49,7 +51,8 @@ class ProductController extends Controller
 
     public function edit(Product $product)
     {
-        return view('products.edit', compact('product'));
+        $categories = Category::where('parent_id', '!=', 0)->get();
+        return view('products.edit', compact('product', 'categories'));
     }
 
     public function update(Request $request, Product $product)
@@ -58,14 +61,16 @@ class ProductController extends Controller
             'name' => 'required',
             'catalog_id' => 'nullable|integer',
             'content' => 'nullable|string',
-            'price' => 'required|numeric',
-            'discount_price' => 'nullable|numeric',
+            'price' => 'required|numeric|min:0',
             'image_link' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Sửa dòng này
             'viewer' => 'nullable|integer',
             'buyed' => 'nullable|integer',
             'rate_total' => 'nullable|integer',
             'rate_count' => 'nullable|integer',
             'quantity' => 'required|integer|min:0',
+        ], [
+            'price.min' => 'Giá sản phẩm không được là số âm',
+            'quantity.min' => 'Số lượng không được là số âm',
         ]);
         $data = $request->all();
         if ($request->hasFile('image_link')) {

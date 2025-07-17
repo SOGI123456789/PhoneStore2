@@ -31,7 +31,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="price">Giá</label>
-                                <input type="number" class="form-control" name="price" value="{{ old('price') }}" required>
+                                <input type="number" class="form-control" name="price" value="{{ old('price') }}" min="0" step="0.01" required>
                             </div>
                             <div class="form-group">
                                 <label for="quantity">Số lượng</label>
@@ -61,4 +61,30 @@
             </div>
         </div>
     </div>
+@endsection
+
+@section('scripts')
+<script>
+    // Ngăn chặn nhập số âm
+    document.addEventListener('DOMContentLoaded', function() {
+        const numberInputs = document.querySelectorAll('input[type="number"]');
+        
+        numberInputs.forEach(function(input) {
+            if (input.name === 'price' || input.name === 'quantity') {
+                input.addEventListener('input', function() {
+                    if (parseFloat(this.value) < 0) {
+                        this.value = 0;
+                    }
+                });
+                
+                input.addEventListener('keypress', function(e) {
+                    // Ngăn chặn nhập dấu trừ
+                    if (e.key === '-') {
+                        e.preventDefault();
+                    }
+                });
+            }
+        });
+    });
+</script>
 @endsection
