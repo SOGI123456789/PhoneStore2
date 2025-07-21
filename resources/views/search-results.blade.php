@@ -149,6 +149,27 @@
                                 </div>
                             </div>
 
+                            <!-- Lọc theo giá tiền -->
+                            <div class="sidebar-widget-body">
+                                <h4>Giá tiền</h4>
+                                <input type="number" name="price_min" class="form-control" placeholder="Từ (VNĐ)" value="{{ request('price_min') }}">
+                                <input type="number" name="price_max" class="form-control" placeholder="Đến (VNĐ)" value="{{ request('price_max') }}">
+                            </div>
+
+                            <!-- Lọc theo RAM -->
+                            <div class="sidebar-widget-body">
+                                <h4>RAM</h4>
+                                <div>
+                                    <label><input type="checkbox" name="ram[]" value="4GB" {{ in_array('4GB', (array)request('ram', [])) ? 'checked' : '' }}> 4 GB</label>
+                                </div>
+                                <div>
+                                    <label><input type="checkbox" name="ram[]" value="8GB" {{ in_array('8GB', (array)request('ram', [])) ? 'checked' : '' }}> 8 GB</label>
+                                </div>
+                                <div>
+                                    <label><input type="checkbox" name="ram[]" value="16GB" {{ in_array('16GB', (array)request('ram', [])) ? 'checked' : '' }}> 16 GB</label>
+                                </div>
+                            </div>
+
                             <button type="submit" class="btn btn-primary btn-block">Áp dụng bộ lọc</button>
                         </form>
                     </div>

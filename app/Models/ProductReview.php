@@ -16,7 +16,6 @@ class ProductReview extends Model
         'rating',
         'review',
         'is_verified',
-        'is_approved',
         'pros',
         'cons',
         'reviewer_name',
@@ -28,7 +27,6 @@ class ProductReview extends Model
         'cons' => 'array',
         'images' => 'array',
         'is_verified' => 'boolean',
-        'is_approved' => 'boolean',
     ];
 
     // Quan hệ với Product
@@ -49,11 +47,7 @@ class ProductReview extends Model
         return $this->belongsTo(Order::class);
     }
 
-    // Scope cho đánh giá đã được duyệt
-    public function scopeApproved($query)
-    {
-        return $query->where('is_approved', true);
-    }
+
 
     // Scope cho đánh giá đã xác minh
     public function scopeVerified($query)

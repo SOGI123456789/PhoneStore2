@@ -13,54 +13,67 @@ use Illuminate\Support\Facades\DB;
 class ReviewController extends Controller
 {
     // Hiển thị tất cả đánh giá của sản phẩm
-    public function index(Request $request, $productId)
+    public function index(Request $request, $productId = null)
     {
-        $product = Product::findOrFail($productId);
-        
-        // Khởi tạo query
-        $query = ProductReview::where('product_id', $productId)
-            ->where('is_approved', true)
-            ->with('user');
-        
-        // Lọc theo rating
-        if ($request->filled('rating')) {
-            $query->where('rating', $request->rating);
-        }
-        
-        // Lọc theo loại
-        if ($request->filled('filter')) {
-            switch ($request->filter) {
-                case 'verified':
-                    $query->where('is_verified', true);
+        if ($productId) {
+            $product = Product::findOrFail($productId);
+            
+            // Khởi tạo query
+            $query = ProductReview::where('product_id', $productId)
+                ->with('user');
+            
+            // Lọc theo rating
+            if ($request->filled('rating')) {
+                $query->where('rating', $request->rating);
+            }
+            
+            // Lọc theo loại
+            if ($request->filled('filter')) {
+                switch ($request->filter) {
+                    case 'verified':
+                        $query->where('is_verified', true);
+                        break;
+                    case 'with_review':
+                        $query->whereNotNull('review');
+                        break;
+                }
+            }
+            
+            // Sắp xếp
+            $sortBy = $request->get('sort_by', 'newest');
+            
+            switch ($sortBy) {
+                case 'oldest':
+                    $query->orderBy('created_at', 'asc');
                     break;
-                case 'with_review':
-                    $query->whereNotNull('review');
+                case 'highest_rating':
+                    $query->orderBy('rating', 'desc')->orderBy('created_at', 'desc');
+                    break;
+                case 'lowest_rating':
+                    $query->orderBy('rating', 'asc')->orderBy('created_at', 'desc');
+                    break;
+                default: // newest
+                    $query->orderBy('created_at', 'desc');
                     break;
             }
+            
+            // Phân trang
+            $reviews = $query->paginate(10);
+            
+            return view('reviews.index', compact('product', 'reviews', 'sortBy'));
+        } else {
+            $query = Product::query();
+
+            if ($request->has('category_id')) {
+                $query->where('category_id', $request->category_id);
+            }
+
+            // Các điều kiện lọc khác...
+            $products = $query->get();
+
+            // Truyền $products về view
+            return view('reviews.index', compact('products'));
         }
-        
-        // Sắp xếp
-        $sortBy = $request->get('sort_by', 'newest');
-        
-        switch ($sortBy) {
-            case 'oldest':
-                $query->orderBy('created_at', 'asc');
-                break;
-            case 'highest_rating':
-                $query->orderBy('rating', 'desc')->orderBy('created_at', 'desc');
-                break;
-            case 'lowest_rating':
-                $query->orderBy('rating', 'asc')->orderBy('created_at', 'desc');
-                break;
-            default: // newest
-                $query->orderBy('created_at', 'desc');
-                break;
-        }
-        
-        // Phân trang
-        $reviews = $query->paginate(10);
-        
-        return view('reviews.index', compact('product', 'reviews', 'sortBy'));
     }
     // Hiển thị form đánh giá sản phẩm
     public function create(Request $request, $productId)
@@ -268,8 +281,7 @@ class ReviewController extends Controller
     // Cập nhật rating trung bình cho product
     private function updateProductRating($productId)
     {
-        $reviews = ProductReview::where('product_id', $productId)
-            ->where('is_approved', true);
+        $reviews = ProductReview::where('product_id', $productId);
 
         $rateCount = $reviews->count();
         $rateTotal = $reviews->sum('rating');

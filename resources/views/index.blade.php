@@ -87,7 +87,13 @@
                       {{ \Str::limit($product->name, 40) }}
                     </h5>
                     <p style="margin-bottom: 10px; color: #e74c3c; font-weight: bold; font-size: 16px;">
-                      <strong>Giá bán:</strong> {{ number_format($product->price, 0, ',', '.') }}đ
+                      <strong>Giá bán:</strong>
+                      {{ number_format($product->discount_price ?: $product->price, 0, ',', '.') }}đ
+                      @if($product->discount_price)
+                        <span class="price-before-discount" style="text-decoration: line-through; color: #888; font-size: 13px; margin-left: 8px;">
+                          {{ number_format($product->price, 0, ',', '.') }}đ
+                        </span>
+                      @endif
                     </p>
                     <div style="display: flex; gap: 10px; justify-content: center;">
                       <a href="{{ route('product.detail', $product->id) }}" class="btn btn-primary" style="background: linear-gradient(45deg, #e74c3c, #c0392b); color: white; border: none; border-radius: 5px; flex: 1;">

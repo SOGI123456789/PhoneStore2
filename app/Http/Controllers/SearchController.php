@@ -13,6 +13,8 @@ class SearchController extends Controller
         $query = $request->input('q');
         $categoryId = $request->input('category_id');
         $sortBy = $request->input('sort_by', 'newest');
+        $priceMin = $request->input('price_min');
+        $priceMax = $request->input('price_max');
 
         // Nếu không có từ khóa tìm kiếm
         if (empty($query)) {
@@ -20,12 +22,28 @@ class SearchController extends Controller
         }
 
         // Tìm kiếm sản phẩm
-        $products = Product::where('name', 'like', '%' . $query . '%')
-            ->orWhere('content', 'like', '%' . $query . '%');
+        $products = Product::where(function($q) use ($query) {
+                $q->where('name', 'like', '%' . $query . '%')
+                  ->orWhere('content', 'like', '%' . $query . '%');
+            });
 
         // Lọc theo danh mục nếu có
         if (!empty($categoryId)) {
-            $products = $products->where('catalog_id', $categoryId);
+            $products->where('catalog_id', $categoryId);
+        }
+        // Lọc theo RAM
+        $ramArr = $request->input('ram', []);
+        if (!empty($ramArr)) {
+            $products->whereHas('attributes', function($q) use ($ramArr) {
+                $q->where('attribute_key', 'ram')->whereIn('attribute_value', $ramArr);
+            });
+        }
+        // Lọc theo giá tiền
+        if (!empty($priceMin)) {
+            $products->where('price', '>=', $priceMin);
+        }
+        if (!empty($priceMax)) {
+            $products->where('price', '<=', $priceMax);
         }
 
         // Sắp xếp kết quả
@@ -52,7 +70,7 @@ class SearchController extends Controller
         // Lấy danh mục để hiển thị filter
         $categories = Category::where('parent_id', '!=', null)->get();
 
-        return view('search-results', compact('products', 'query', 'categories', 'categoryId', 'sortBy'));
+        return view('search-results', compact('products', 'query', 'categories', 'categoryId', 'sortBy', 'priceMin', 'priceMax'));
     }
 
     public function suggestions(Request $request)

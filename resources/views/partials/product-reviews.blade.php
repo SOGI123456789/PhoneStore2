@@ -215,10 +215,6 @@
                         <a href="{{ route('reviews.create', $product->id) }}" class="btn btn-primary">
                             <i class="fa fa-star"></i> Viết đánh giá đầu tiên
                         </a>
-                    @else
-                        <a href="{{ route('login') }}" class="btn btn-primary">
-                            <i class="fa fa-sign-in"></i> Đăng nhập để đánh giá
-                        </a>
                     @endauth
                 </div>
                 @endif

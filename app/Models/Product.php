@@ -40,7 +40,7 @@ class Product extends Model
     // Quan hệ với reviews đã duyệt
     public function approvedReviews()
     {
-        return $this->hasMany(ProductReview::class)->where('is_approved', true);
+        return $this->hasMany(ProductReview::class);
     }
 
     // Tính điểm trung bình
