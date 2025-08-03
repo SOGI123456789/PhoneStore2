@@ -7,19 +7,19 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 		<meta name="description" content="">
 		<meta name="author" content="">
-	    <meta name="keywords" content="MediaCenter, Template, eCommerce">
-	    <meta name="robots" content="all">
+		<meta name="keywords" content="MediaCenter, Template, eCommerce">
+		<meta name="robots" content="all">
 		<meta name="csrf-token" content="{{ csrf_token() }}">
 
-	    <title>Flipmart premium HTML5 & CSS3 Template</title>
+		<title>Flipmart premium HTML5 & CSS3 Template</title>
 
-	    <!-- Bootstrap Core CSS -->
-	    <link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
-	    
-	    <!-- Customizable CSS -->
-	    <link rel="stylesheet" href="{{asset('assets/css/main.css')}}">
-	    <link rel="stylesheet" href="{{asset('assets/css/blue.css')}}">
-	    <link rel="stylesheet" href="{{asset('assets/css/owl.carousel.css')}}">
+		<!-- Bootstrap Core CSS -->
+		<link rel="stylesheet" href="{{asset('assets/css/bootstrap.min.css')}}">
+		
+		<!-- Customizable CSS -->
+		<link rel="stylesheet" href="{{asset('assets/css/main.css')}}">
+		<link rel="stylesheet" href="{{asset('assets/css/blue.css')}}">
+		<link rel="stylesheet" href="{{asset('assets/css/owl.carousel.css')}}">
 		<link rel="stylesheet" href="{{asset('assets/css/owl.transitions.css')}}">
 		<link rel="stylesheet" href="{{asset('assets/css/animate.min.css')}}">
 		<link rel="stylesheet" href="{{asset('assets/css/rateit.css')}}">
@@ -28,14 +28,14 @@
 		<!-- Icons/Glyphs -->
 		<link rel="stylesheet" href="{{asset('assets/css/font-awesome.css')}}">
 
-        <!-- Fonts --> 
+		<!-- Fonts --> 
 		<link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,400italic,600,600italic,700,700italic,800' rel='stylesheet' type='text/css'>
-        <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+		<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 
 
 	</head>
-    <body class="cnt-home">
+	<body class="cnt-home">
 		<!-- ============================================== HEADER ============================================== -->
 @include('partials.headerKH')
 
@@ -70,18 +70,6 @@
 					<th class="cart-total last-item">Grandtotal</th>
 				</tr>
 			</thead><!-- /thead -->
-			<tfoot>
-				<tr>
-					<td colspan="7">
-						<div class="shopping-cart-btn">
-							<span class="">
-								<a href="#" class="btn btn-upper btn-primary outer-left-xs">Continue Shopping</a>
-								<a href="#" class="btn btn-upper btn-primary pull-right outer-right-xs">Update shopping cart</a>
-							</span>
-						</div><!-- /.shopping-cart-btn -->
-					</td>
-				</tr>
-			</tfoot>
 			<tbody>
 				@if(count($cart) > 0)
 					@foreach($cart as $id => $item)
@@ -208,6 +196,8 @@
 										<div class="cart-checkout-btn pull-right">
 											@if(count($cart) > 0)
 												<button type="button" onclick="proceedToCheckout()" class="btn btn-primary checkout-btn">Gửi đơn hàng</button>
+												<button type="button" onclick="payWithMomo()" class="btn btn-success" style="margin-left:10px;">Thanh toán qua Momo</button>
+												<button type="button" onclick="payWithBankQr()" class="btn btn-info" style="margin-left:10px;">Thanh toán qua Ngân hàng</button>
 											@endif
 										</div>
 									</td>
@@ -284,7 +274,7 @@
 						<img data-echo="assets/images/brands/brand5.png" src="assets\images\blank.gif" alt="">
 					</a>	
 				</div><!--/.item-->
-		    </div><!-- /.owl-carousel #logo-slider -->
+			</div><!-- /.owl-carousel #logo-slider -->
 		</div><!-- /.logo-slider-inner -->
 	
 </div><!-- /.logo-slider -->
@@ -311,11 +301,53 @@
 	<script src="{{asset('assets/js/echo.min.js')}}"></script>
 	<script src="{{asset('assets/js/jquery.easing-1.3.min.js')}}"></script>
 	<script src="{{asset('assets/js/bootstrap-slider.min.js')}}"></script>
-    <script src="{{asset('assets/js/jquery.rateit.min.js')}}"></script>
-    <script type="text/javascript" src="{{asset('assets/js/lightbox.min.js')}}"></script>
-    <script src="{{asset('assets/js/bootstrap-select.min.js')}}"></script>
-    <script src="{{asset('assets/js/wow.min.js')}}"></script>
+	<script src="{{asset('assets/js/jquery.rateit.min.js')}}"></script>
+	<script type="text/javascript" src="{{asset('assets/js/lightbox.min.js')}}"></script>
+	<script src="{{asset('assets/js/bootstrap-select.min.js')}}"></script>
+	<script src="{{asset('assets/js/wow.min.js')}}"></script>
 	<script src="{{asset('assets/js/scripts.js')}}"></script>
+
+	<!-- Modal hiển thị mã QR Momo -->
+	<div class="modal fade" id="momoQrModal" tabindex="-1" role="dialog" aria-labelledby="momoQrModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="momoQrModalLabel">Quét mã QR để thanh toán qua Momo</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body" style="text-align:center;">
+			<img id="momoQrImg" src="" alt="Momo QR" style="max-width:300px; max-height:300px;" />
+			<p style="margin-top:10px;">Vui lòng quét mã QR bằng ứng dụng Momo để thanh toán.</p>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
+
+	<!-- Modal hiển thị mã QR Ngân hàng -->
+	<div class="modal fade" id="bankQrModal" tabindex="-1" role="dialog" aria-labelledby="bankQrModalLabel" aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+		<div class="modal-content">
+		  <div class="modal-header">
+			<h5 class="modal-title" id="bankQrModalLabel">Quét mã QR để chuyển khoản ngân hàng</h5>
+			<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+			  <span aria-hidden="true">&times;</span>
+			</button>
+		  </div>
+		  <div class="modal-body" style="text-align:center;">
+			<img id="bankQrImg" src="" alt="Bank QR" style="max-width:300px; max-height:300px;" />
+			<p style="margin-top:10px;">Vui lòng quét mã QR bằng ứng dụng ngân hàng để chuyển khoản.</p>
+		  </div>
+		  <div class="modal-footer">
+			<button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+		  </div>
+		</div>
+	  </div>
+	</div>
 
 	<script>
 	$.ajaxSetup({
@@ -324,12 +356,65 @@
 		}
 	});
 
+	function payWithMomo() {
+		$.ajax({
+			url: '{{ route("momo.qr") }}',
+			method: 'POST',
+			data: {
+				amount: {{ $total }},
+				order_code: 'ORDER_TEST_{{ time() }}',
+				_token: $('meta[name="csrf-token"]').attr('content')
+			},
+			success: function(response) {
+				console.log('Momo response:', response);
+				if(response.qr_url) {
+					var qrSrc = response.qr_url;
+					if(!qrSrc.startsWith('data:image')) {
+						qrSrc = 'https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=' + encodeURIComponent(response.qr_url);
+					}
+					$('#momoQrImg').attr('src', qrSrc);
+					$('#momoQrModal').modal('show');
+				} else {
+					alert('Không lấy được mã QR Momo!');
+				}
+			},
+			error: function(xhr) {
+				console.log('Momo error:', xhr.responseText);
+				alert('Có lỗi xảy ra khi tạo mã QR Momo!');
+			}
+		});
+	}
+
+	function payWithBankQr() {
+		$.ajax({
+			url: '{{ route("bank.qr") }}',
+			method: 'POST',
+			data: {
+				amount: {{ $total }},
+				order_code: 'ORDER_TEST_{{ time() }}',
+				_token: $('meta[name="csrf-token"]').attr('content')
+			},
+			success: function(response) {
+				console.log('Bank QR response:', response);
+				if(response.qr_url) {
+					$('#bankQrImg').attr('src', response.qr_url);
+					$('#bankQrModal').modal('show');
+				} else {
+					alert('Không lấy được mã QR Ngân hàng!');
+				}
+			},
+			error: function(xhr) {
+				console.log('Bank QR error:', xhr.responseText);
+				alert('Có lỗi xảy ra khi tạo mã QR Ngân hàng!');
+			}
+		});
+	}
+
 	function updateQuantity(productId, quantity) {
 		if(quantity < 1) {
 			removeFromCart(productId);
 			return;
 		}
-		
 		$.ajax({
 			url: '{{ route("cart.update") }}',
 			method: 'POST',
@@ -369,16 +454,12 @@
 	}
 
 	function proceedToCheckout() {
-		// Kiểm tra form thông tin khách hàng
 		var customerName = $('#customer_name').val();
 		var customerEmail = $('#customer_email').val();
-		
 		if(!customerName || !customerEmail) {
 			alert('Vui lòng nhập đầy đủ họ tên và email!');
 			return;
 		}
-		
-		// Lấy thông tin từ form
 		var customerData = {
 			customer_name: customerName,
 			customer_email: customerEmail,
@@ -388,7 +469,6 @@
 			payment_method: $('#payment_method').val(),
 			_token: $('meta[name="csrf-token"]').attr('content')
 		};
-		
 		if(confirm('Bạn có chắc muốn gửi đơn hàng này?')) {
 			$.ajax({
 				url: '{{ route("orders.create") }}',

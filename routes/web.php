@@ -1,4 +1,11 @@
+
 <?php
+use App\Http\Controllers\BankQrController;
+// Định nghĩa route bank.qr đúng chuẩn
+Route::post('/bank/qr', [BankQrController::class, 'createQr'])->name('bank.qr');
+use App\Http\Controllers\MomoController;
+// Định nghĩa route momo.qr đúng chuẩn
+Route::post('/momo/qr', [MomoController::class, 'createQr'])->name('momo.qr');
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
