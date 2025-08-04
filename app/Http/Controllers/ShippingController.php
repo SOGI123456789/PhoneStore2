@@ -13,13 +13,16 @@ class ShippingController extends Controller
         $orders = Order::where(function($query) {
             $query->whereNull('shipper_id')
                 ->where('status', 'processing')
-                ->where('payment_method', 'cod')
-                ->where('payment_status', 'paid')
-                ->orWhere(function($q) {
-                    $q->where('shipper_id', Auth::id())
-                        ->where('status', 'shipping');
+                ->where(function($q) {
+                    $q->where('payment_method', 'cod')
+                      ->orWhere('payment_status', 'paid');
                 });
-        })->get();
+        })
+        ->orWhere(function($q) {
+            $q->where('shipper_id', Auth::id())
+              ->where('status', 'shipping');
+        })
+        ->get();
         return view('shipping.index', compact('orders'));
     }
 
@@ -37,12 +40,13 @@ class ShippingController extends Controller
         if (
             $order->shipper_id === null &&
             $order->status === 'processing' &&
-            $order->payment_method === 'cod' &&
-            $order->payment_status === 'paid'
+            (
+                $order->payment_method === 'cod' || $order->payment_status === 'paid'
+            )
         ) {
             $order->shipper_id = Auth::id();
             $order->status = 'shipping';
-            $order->save();
+            $order->save(); 
             return redirect()->route('shipping.index')->with('success', 'Bạn đã nhận giao đơn hàng!');
         } elseif ($order->shipper_id == Auth::id() && $order->status === 'shipping') {
             $order->status = 'delivered';

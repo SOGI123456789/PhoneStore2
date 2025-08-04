@@ -152,24 +152,17 @@
 									   value="{{ auth()->check() ? auth()->user()->email : '' }}" required>
 							</div>
 							<div class="form-group">
-								<label for="customer_phone">Số điện thoại</label>
+								<label for="customer_phone">Số điện thoại *</label>
 								<input type="text" class="form-control" id="customer_phone" name="customer_phone" 
-									   value="{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : '' }}">
+									   value="{{ auth()->check() && auth()->user()->phone ? auth()->user()->phone : '' }}" required>
 							</div>
 							<div class="form-group">
-								<label for="customer_address">Địa chỉ</label>
-								<textarea class="form-control" id="customer_address" name="customer_address" rows="3">{{ auth()->check() && auth()->user()->address ? auth()->user()->address : '' }}</textarea>
+								<label for="customer_address">Địa chỉ *</label>
+								<textarea class="form-control" id="customer_address" name="customer_address" rows="3" required>{{ auth()->check() && auth()->user()->address ? auth()->user()->address : '' }}</textarea>
 							</div>
 							<div class="form-group">
 								<label for="notes">Ghi chú</label>
 								<textarea class="form-control" id="notes" name="notes" rows="2" placeholder="Ghi chú đơn hàng (không bắt buộc)"></textarea>
-							</div>
-							<div class="form-group">
-								<label for="payment_method">Phương thức thanh toán *</label>
-								<select class="form-control" id="payment_method" name="payment_method" required>
-									<option value="cod">Thanh toán khi nhận hàng (COD)</option>
-									<option value="bank_transfer">Chuyển khoản ngân hàng</option>
-								</select>
 							</div>
 						</form>
 					</div>
@@ -356,6 +349,47 @@
 		}
 	});
 
+	function proceedToCheckout(paymentType) {
+		var customerName = $('#customer_name').val();
+		var customerEmail = $('#customer_email').val();
+		var customerPhone = $('#customer_phone').val();
+		var customerAddress = $('#customer_address').val();
+		if(!customerName || !customerEmail || !customerPhone || !customerAddress) {
+			alert('Vui lòng nhập đầy đủ họ tên, email, số điện thoại và địa chỉ!');
+			return;
+		}
+		var payment_method = paymentType ? paymentType : $('#payment_method').val();
+		var customerData = {
+			customer_name: customerName,
+			customer_email: customerEmail,
+			customer_phone: customerPhone,
+			customer_address: customerAddress,
+			notes: $('#notes').val(),
+			payment_method: payment_method,
+			_token: $('meta[name="csrf-token"]').attr('content')
+		};
+		if(confirm('Bạn có chắc muốn gửi đơn hàng này?')) {
+			$.ajax({
+				url: '{{ route("orders.create") }}',
+				method: 'POST',
+				data: customerData,
+				success: function(response) {
+					if(response.success) {
+						alert('Đơn hàng đã được tạo thành công!');
+						window.location.href = '{{ route("index") }}';
+					}
+				},
+				error: function(xhr) {
+					var errorMessage = 'Có lỗi xảy ra khi tạo đơn hàng!';
+					if(xhr.responseJSON && xhr.responseJSON.error) {
+						errorMessage = xhr.responseJSON.error;
+					}
+					alert(errorMessage);
+				}
+			});
+		}
+	}
+
 	function payWithMomo() {
 		$.ajax({
 			url: '{{ route("momo.qr") }}',
@@ -383,6 +417,10 @@
 				alert('Có lỗi xảy ra khi tạo mã QR Momo!');
 			}
 		});
+		// Định nghĩa lại phương thức thanh toán khi dùng QR
+		$('#momoQrModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+			proceedToCheckout('bank_transfer');
+		});
 	}
 
 	function payWithBankQr() {
@@ -407,6 +445,10 @@
 				console.log('Bank QR error:', xhr.responseText);
 				alert('Có lỗi xảy ra khi tạo mã QR Ngân hàng!');
 			}
+		});
+		// Định nghĩa lại phương thức thanh toán khi dùng QR
+		$('#bankQrModal').off('hidden.bs.modal').on('hidden.bs.modal', function () {
+			proceedToCheckout('bank_transfer');
 		});
 	}
 
@@ -452,52 +494,6 @@
 			});
 		}
 	}
-
-	function proceedToCheckout() {
-		var customerName = $('#customer_name').val();
-		var customerEmail = $('#customer_email').val();
-		if(!customerName || !customerEmail) {
-			alert('Vui lòng nhập đầy đủ họ tên và email!');
-			return;
-		}
-		var customerData = {
-			customer_name: customerName,
-			customer_email: customerEmail,
-			customer_phone: $('#customer_phone').val(),
-			customer_address: $('#customer_address').val(),
-			notes: $('#notes').val(),
-			payment_method: $('#payment_method').val(),
-			_token: $('meta[name="csrf-token"]').attr('content')
-		};
-		if(confirm('Bạn có chắc muốn gửi đơn hàng này?')) {
-			$.ajax({
-				url: '{{ route("orders.create") }}',
-				method: 'POST',
-				data: customerData,
-				success: function(response) {
-					if(response.success) {
-						alert('Đơn hàng đã được tạo thành công!');
-						window.location.href = '{{ route("index") }}';
-					}
-				},
-				error: function(xhr) {
-					var errorMessage = 'Có lỗi xảy ra khi tạo đơn hàng!';
-					if(xhr.responseJSON && xhr.responseJSON.error) {
-						errorMessage = xhr.responseJSON.error;
-					}
-					alert(errorMessage);
-				}
-			});
-		}
-	}
-	$(document).ready(function() {
-		$('#bankQrModal').on('hidden.bs.modal', function () {
-			proceedToCheckout();
-		});
-		$('#momoQrModal').on('hidden.bs.modal', function () {
-			proceedToCheckout();
-		});
-	});
 	</script>
 
 	
