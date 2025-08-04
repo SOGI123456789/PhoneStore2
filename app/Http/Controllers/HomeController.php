@@ -13,7 +13,7 @@ class HomeController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if ($user && $user->role_id==1) {
+        if ($user && $user->role_id!==2) {
             // Trả về view home cho admin
             return view('home');
         } else {

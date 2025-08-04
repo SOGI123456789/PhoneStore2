@@ -89,6 +89,12 @@ Route::prefix('menus')->name('menus.')->group(function () {
 Route::get('/register', [LoginController::class, 'showRegistrationForm'])->name('register');
 Route::post('/register', [LoginController::class, 'register']);
 
+// Giao hàng cho nhân viên giao hàng
+Route::middleware(['auth'])->group(function () {
+    Route::get('shipping', [App\Http\Controllers\ShippingController::class, 'index'])->name('shipping.index');
+    Route::get('shipping/{id}', [App\Http\Controllers\ShippingController::class, 'show'])->name('shipping.show');
+    Route::post('shipping/{id}/accept', [App\Http\Controllers\ShippingController::class, 'accept'])->name('shipping.accept');
+});
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

@@ -35,7 +35,7 @@ class LoginController extends Controller
             'email'    => $request->email,
             'phone'    => $request->phone,
             'password' => Hash::make($request->password),
-            'role_id'  => 2, // Mặc định là user
+            'role_id'  => 2,
         ]);
 
         Auth::login($user);
@@ -54,12 +54,11 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials, $remember)) {
             $user = Auth::user();
-            $user->load('role');
-            
-            if ($user && $user->role && $user->role->name === 'admin') {
-                return redirect()->route('home');
-            } else {
+            // Nếu dùng cột role_id trực tiếp trên bảng users
+            if ($user && $user->role_id == 2) {
                 return redirect()->route('index');
+            } else {
+                return redirect()->route('home');
             }
         }
 

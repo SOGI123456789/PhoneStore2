@@ -60,7 +60,7 @@
                         </li>
                     @elseif($roleId == 3)
                         <li class="nav-item">
-                            <a href="{{route('orders.index')}}" class="nav-link">
+                            <a href="{{route('shipping.index')}}" class="nav-link">
                                 <i class="nav-icon fas fa-th"></i>
                                 <p>Quản lý giao hàng</p>
                             </a>
