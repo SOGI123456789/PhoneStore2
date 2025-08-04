@@ -25,58 +25,55 @@
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
                 <
-                <li class="nav-item">
-                    <a href="{{route('categories.index')}}" class="nav-link">
-                        <i class="nav-icon fas fa-th"></i>
-                        <p>
-                            Danh mục sản phẩm
-
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('menus.index') }}" class="nav-link">
-                        <i class="nav-icon fas fa-th"></i>
-                        <p>
-                            Quản lý menu
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{route('products.index')}}" class="nav-link">
-                        <i class="nav-icon fas fa-th"></i>
-                        <p>
-                                Quản lý sản phẩm
-
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{route('roles.index')}}" class="nav-link">
-                        <i class="nav-icon fas fa-th"></i>
-                        <p>
-                            Phân quyền
-
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{route('orders.index')}}" class="nav-link">
-                        <i class="nav-icon fas fa-th"></i>
-                        <p>
-                            Quản lý đơn hàng
-
-                        </p>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{route('categories.index')}}" class="nav-link">
-                        <i class="nav-icon fas fa-th"></i>
-                        <p>
-                            Quản lý đơn hàng
-                        </p>
-                    </a>
-                </li>
+                @if(auth()->check())
+                    @php $roleId = auth()->user()->role_id ?? 0; @endphp
+                    @if($roleId == 1)
+                        <li class="nav-item">
+                            <a href="{{route('categories.index')}}" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Danh mục sản phẩm</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('menus.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Quản lý menu</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('products.index')}}" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Quản lý sản phẩm</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('roles.index')}}" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Phân quyền</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('orders.index')}}" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Quản lý đơn hàng</p>
+                            </a>
+                        </li>
+                    @elseif($roleId == 3)
+                        <li class="nav-item">
+                            <a href="{{route('orders.index')}}" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Quản lý giao hàng</p>
+                            </a>
+                        </li>
+                    @elseif($roleId == 4)
+                        <li class="nav-item">
+                            <a href="{{route('orders.index')}}" class="nav-link">
+                                <i class="nav-icon fas fa-th"></i>
+                                <p>Quản lý đơn hàng</p>
+                            </a>
+                        </li>
+                    @endif
+                @endif
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

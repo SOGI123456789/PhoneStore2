@@ -490,6 +490,14 @@
 			});
 		}
 	}
+	$(document).ready(function() {
+		$('#bankQrModal').on('hidden.bs.modal', function () {
+			proceedToCheckout();
+		});
+		$('#momoQrModal').on('hidden.bs.modal', function () {
+			proceedToCheckout();
+		});
+	});
 	</script>
 
 	
