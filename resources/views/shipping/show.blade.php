@@ -47,10 +47,6 @@
                                         @endforelse
                                     </tbody>
                                 </table>
-                                <form action="{{ route('shipping.accept', $order->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit" class="btn btn-success" onclick="return confirm('Bạn chắc chắn nhận giao đơn hàng này?')">Nhận giao đơn hàng này</button>
-                                </form>
                             </div>
                         </div>
                     </div>
