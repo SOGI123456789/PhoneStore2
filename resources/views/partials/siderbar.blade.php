@@ -30,45 +30,51 @@
                     @if($roleId == 1)
                         <li class="nav-item">
                             <a href="{{route('categories.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-list"></i>
                                 <p>Danh mục sản phẩm</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{ route('menus.index') }}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-bars"></i>
                                 <p>Quản lý menu</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{route('products.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-mobile-alt"></i>
                                 <p>Quản lý sản phẩm</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{route('roles.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-user-shield"></i>
                                 <p>Phân quyền</p>
                             </a>
                         </li>
                         <li class="nav-item">
                             <a href="{{route('orders.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>Quản lý đơn hàng</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('statistics.index') }}" class="nav-link">
+                                <i class="nav-icon fas fa-chart-bar"></i>
+                                <p>Thống kê doanh thu & Top bán chạy</p>
                             </a>
                         </li>
                     @elseif($roleId == 3)
                         <li class="nav-item">
                             <a href="{{route('shipping.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-shipping-fast"></i>
                                 <p>Quản lý giao hàng</p>
                             </a>
                         </li>
                     @elseif($roleId == 4)
                         <li class="nav-item">
                             <a href="{{route('orders.index')}}" class="nav-link">
-                                <i class="nav-icon fas fa-th"></i>
+                                <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>Quản lý đơn hàng</p>
                             </a>
                         </li>

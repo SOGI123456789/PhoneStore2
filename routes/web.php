@@ -1,4 +1,3 @@
-
 <?php
 use App\Http\Controllers\BankQrController;
 // Định nghĩa route bank.qr đúng chuẩn
@@ -19,6 +18,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\StatisticsController;
 
 Route::get('/home', [HomeController::class, 'index'])->name('home');
 
@@ -146,3 +146,12 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/product/{id}/reviews', [ReviewController::class, 'index'])->name('reviews.index');
+
+// Thống kê doanh thu theo tuần
+Route::get('statistics/revenue-week', [StatisticsController::class, 'revenueWeek'])->name('statistics.revenueWeek');
+// Thống kê doanh thu theo tháng
+Route::get('statistics/revenue-month', [StatisticsController::class, 'revenueMonth'])->name('statistics.revenueMonth');
+// Thống kê top sản phẩm bán chạy
+Route::get('statistics/top-products', [StatisticsController::class, 'topProducts'])->name('statistics.topProducts');
+// Trang thống kê tổng hợp với lọc tuần/tháng
+Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
