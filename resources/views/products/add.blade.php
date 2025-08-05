@@ -25,36 +25,41 @@
                                 <label for="name">Tên sản phẩm</label>
                                 <input type="text" class="form-control" name="name" value="{{ old('name') }}" required>
                             </div>
-                            <div class="form-group">
-                                <label for="content">Mô tả</label>
-                                <textarea class="form-control" name="content">{{ old('content') }}</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="price">Giá</label>
-                                <input type="number" class="form-control" name="price" value="{{ old('price') }}" min="0" step="0.01" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="quantity">Số lượng</label>
-                                <input type="number" class="form-control" name="quantity" value="{{ old('quantity', 0) }}" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="image_link">Ảnh sản phẩm</label>
-                                <input type="file" class="form-control" name="image_link">
-                                @if(isset($product) && $product->image_link)
-                                    <img src="{{ asset('storage/' . $product->image_link) }}" alt="Ảnh" width="80">
-                                @endif
-                            </div>
+                            
                             <div class="form-group">
                                 <label for="catalog_id">Danh mục sản phẩm</label>
                                 <select name="catalog_id" class="form-control" required>
                                     <option value="">-- Chọn danh mục --</option>
                                     @foreach($categories as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                        <option value="{{ $category->id }}" {{ old('catalog_id') == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-success">Lưu</button>
-                            <a href="{{ route('products.index') }}" class="btn btn-secondsary">Quay lại</a>
+                            
+                            <div class="form-group">
+                                <label for="brand">Thương hiệu</label>
+                                <input type="text" class="form-control" name="brand" value="{{ old('brand') }}" placeholder="VD: Apple, Samsung...">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="content">Mô tả sản phẩm</label>
+                                <textarea class="form-control" name="content" rows="4" placeholder="Mô tả chi tiết về sản phẩm...">{{ old('content') }}</textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="image_link">Ảnh sản phẩm chính</label>
+                                <input type="file" class="form-control" name="image_link" accept="image/*">
+                                <small class="form-text text-muted">Chọn ảnh đại diện cho sản phẩm (jpeg, png, jpg, gif, svg tối đa 2MB)</small>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <strong>Lưu ý:</strong> Sau khi tạo sản phẩm, bạn cần thêm các variants (màu sắc, RAM, ROM, giá) để khách hàng có thể mua sản phẩm.
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success">Tạo sản phẩm</button>
+                            <a href="{{ route('products.index') }}" class="btn btn-secondary">Quay lại</a>
                         </form>
                     </div>
                 </div>
@@ -65,26 +70,33 @@
 
 @section('scripts')
 <script>
-    // Ngăn chặn nhập số âm
+    // Preview ảnh khi chọn file
     document.addEventListener('DOMContentLoaded', function() {
-        const numberInputs = document.querySelectorAll('input[type="number"]');
+        const imageInput = document.querySelector('input[name="image_link"]');
         
-        numberInputs.forEach(function(input) {
-            if (input.name === 'price' || input.name === 'quantity') {
-                input.addEventListener('input', function() {
-                    if (parseFloat(this.value) < 0) {
-                        this.value = 0;
-                    }
-                });
-                
-                input.addEventListener('keypress', function(e) {
-                    // Ngăn chặn nhập dấu trừ
-                    if (e.key === '-') {
-                        e.preventDefault();
-                    }
-                });
-            }
-        });
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        // Tạo hoặc cập nhật preview
+                        let preview = document.getElementById('image-preview');
+                        if (!preview) {
+                            preview = document.createElement('img');
+                            preview.id = 'image-preview';
+                            preview.style.marginTop = '10px';
+                            preview.style.maxWidth = '200px';
+                            preview.style.border = '1px solid #ddd';
+                            preview.style.borderRadius = '4px';
+                            imageInput.parentNode.appendChild(preview);
+                        }
+                        preview.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
     });
 </script>
 @endsection

@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
+    // Hiển thị chi tiết đơn hàng
+    public function detail($id)
+    {
+        $order = Order::with('orderItems')->findOrFail($id);
+        return view('orders.detail', compact('order'));
+    }
     // Hiển thị form checkout
     public function checkout()
     {
@@ -137,7 +143,7 @@ class OrderController extends Controller
     public function show($id)
     {
         $order = Order::with('items')->findOrFail($id);
-        return view('orders.index', compact('order'));
+        return view('orders.detail', compact('order'));
     
         foreach($cart as $item) {
             $total += $item['price'] * $item['quantity'];
@@ -280,7 +286,8 @@ class OrderController extends Controller
     {
         $request->validate([
             'status' => 'required|in:pending,processing,shipped,delivered,cancelled',
-            'payment_status' => 'required|in:pending,paid,failed'
+            'payment_status' => 'required|in:pending,paid,failed',
+            'imeis' => 'required|array',
         ]);
 
         $order = Order::findOrFail($id);
@@ -288,6 +295,15 @@ class OrderController extends Controller
             'status' => $request->status,
             'payment_status' => $request->payment_status
         ]);
+
+        // Cập nhật IMEI cho từng sản phẩm
+        foreach ($request->imeis as $itemId => $imei) {
+            $orderItem = $order->orderItems()->where('id', $itemId)->first();
+            if ($orderItem) {
+                $orderItem->imei = $imei;
+                $orderItem->save();
+            }
+        }
 
         return redirect()->route('orders.index')->with('success', 'Cập nhật đơn hàng thành công!');
     }

@@ -15,6 +15,7 @@ class ProductAttribute extends Model
         'product_id',
         'attribute_key',
         'attribute_value',
+        'price_adjustment',
     ];
 
     public $timestamps = false;

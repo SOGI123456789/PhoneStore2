@@ -1,10 +1,5 @@
 <?php
 use App\Http\Controllers\BankQrController;
-// Định nghĩa route bank.qr đúng chuẩn
-Route::post('/bank/qr', [BankQrController::class, 'createQr'])->name('bank.qr');
-use App\Http\Controllers\MomoController;
-// Định nghĩa route momo.qr đúng chuẩn
-Route::post('/momo/qr', [MomoController::class, 'createQr'])->name('momo.qr');
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
@@ -43,6 +38,7 @@ Route::prefix('orders')->name('orders.')->group(function () {
     Route::post('/create', [OrderController::class, 'createOrder'])->name('create');
     Route::get('/', [OrderController::class, 'index'])->name('index');
     Route::get('/{id}', [OrderController::class, 'show'])->name('show');
+    Route::get('/{id}/detail', [OrderController::class, 'detail'])->name('detail');
     Route::get('/{id}/edit', [OrderController::class, 'edit'])->name('edit');
     Route::post('/{id}/update', [OrderController::class, 'update'])->name('update');
     Route::post('/{id}/status', [OrderController::class, 'updateStatus'])->name('update-status');
@@ -106,6 +102,14 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::get('/edit/{product}', [ProductController::class, 'edit'])->name('edit');
     Route::post('/update/{product}', [ProductController::class, 'update'])->name('update');
     Route::delete('/delete/{product}', [ProductController::class, 'delete'])->name('delete');
+    
+    // Variant routes
+    Route::get('/{product}/variants', [ProductController::class, 'variants'])->name('variants');
+    Route::get('/{product}/variants/create', [ProductController::class, 'createVariant'])->name('variants.create');
+    Route::post('/{product}/variants', [ProductController::class, 'storeVariant'])->name('variants.store');
+    Route::get('/{product}/variants/{variant}/edit', [ProductController::class, 'editVariant'])->name('variants.edit');
+    Route::post('/{product}/variants/{variant}', [ProductController::class, 'updateVariant'])->name('variants.update');
+    Route::delete('/{product}/variants/{variant}', [ProductController::class, 'deleteVariant'])->name('variants.delete');
 });
 
 //  ROLES ROUTES
@@ -155,3 +159,8 @@ Route::get('statistics/revenue-month', [StatisticsController::class, 'revenueMon
 Route::get('statistics/top-products', [StatisticsController::class, 'topProducts'])->name('statistics.topProducts');
 // Trang thống kê tổng hợp với lọc tuần/tháng
 Route::get('statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+// Định nghĩa route bank.qr đúng chuẩn
+Route::post('/bank/qr', [BankQrController::class, 'createQr'])->name('bank.qr');
+use App\Http\Controllers\MomoController;
+// Định nghĩa route momo.qr đúng chuẩn
+Route::post('/momo/qr', [MomoController::class, 'createQr'])->name('momo.qr');

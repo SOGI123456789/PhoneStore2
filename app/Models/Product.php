@@ -4,20 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductAttribute;
+use App\Models\ProductVariant;
+
 class Product extends Model
 {
     protected $fillable = [
         'name',
         'catalog_id',
         'content',
-        'price',
-        'discount_price',
+        'brand',
         'image_link',
         'viewer',
         'buyed',
         'rate_total',
         'rate_count',
-        'quantity',
     ];
 
     // Quan hệ với Category
@@ -29,6 +29,12 @@ class Product extends Model
     public function attributes()
     {
         return $this->hasMany(ProductAttribute::class, 'product_id');
+    }
+
+    // Quan hệ với ProductVariant
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class, 'product_id');
     }
 
     // Quan hệ với ProductReview

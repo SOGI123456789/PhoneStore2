@@ -23,7 +23,6 @@
                                     <th scope="col">Email</th>
                                     <th scope="col">Số điện thoại</th>
                                     <th scope="col">Địa chỉ</th>
-                                    <th scope="col">Chi tiết đơn hàng</th>
                                     <th scope="col">Tổng tiền</th>
                                     <th scope="col">Thanh toán</th>
                                     <th scope="col">Tình trạng</th>
@@ -44,26 +43,6 @@
                                         <td>{{ $order->customer_email }}</td>
                                         <td>{{ $order->customer_phone ?: 'Không có' }}</td>
                                         <td>{{ \Str::limit($order->customer_address, 30) ?: 'Không có' }}</td>
-                                        <td style="max-width: 200px;">
-                                            @if($order->orderItems && $order->orderItems->count() > 0)
-                                                <div style="max-height: 100px; overflow-y: auto;">
-                                                    @foreach($order->orderItems as $item)
-                                                        <div class="mb-1 p-1" style="font-size: 12px; border-bottom: 1px solid #eee;">
-                                                            <strong>{{ \Str::limit($item->product->name ?? 'Sản phẩm đã xóa', 25) }}</strong><br>
-                                                            <small class="text-muted">
-                                                                SL: {{ $item->quantity }} × {{ number_format($item->price, 0, ',', '.') }}đ
-                                                                = {{ number_format($item->quantity * $item->price, 0, ',', '.') }}đ
-                                                            </small>
-                                                        </div>
-                                                    @endforeach
-                                                </div>
-                                                <small class="text-info">
-                                                    <strong>Tổng: {{ $order->orderItems->count() }} sản phẩm</strong>
-                                                </small>
-                                            @else
-                                                <span class="text-muted">Chưa có sản phẩm</span>
-                                            @endif
-                                        </td>
                                         <td>{{ number_format($order->total_amount, 0, ',', '.') }}đ</td>
                                         <td>
                                             <span class="badge 
@@ -108,7 +87,8 @@
                                         </td>
                                         <td>{{ \Carbon\Carbon::parse($order->created_at)->format('d/m/Y H:i') }}</td>
                                         <td>
-                                              <a href="{{ route('orders.edit', ['id' => $order->id]) }}" class="btn btn-default btn-sm">Sửa</a>
+                                            <a href="{{ route('orders.detail', ['id' => $order->id]) }}" class="btn btn-info btn-sm">Xem chi tiết</a>
+                                            <a href="{{ route('orders.edit', ['id' => $order->id]) }}" class="btn btn-default btn-sm">Sửa</a>
                                             <form action="{{ route('admin.orders.delete', ['id' => $order->id]) }}" method="POST" style="display:inline;">
                                                 @csrf
                                                 @method('DELETE')
