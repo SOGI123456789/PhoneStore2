@@ -24,7 +24,6 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                 <!-- Add icons to the links using the .nav-icon class
                      with font-awesome or any other icon font library -->
-                <
                 @if(auth()->check())
                     @php $roleId = auth()->user()->role_id ?? 0; @endphp
                     @if($roleId == 1)
@@ -56,6 +55,12 @@
                             <a href="{{route('orders.index')}}" class="nav-link">
                                 <i class="nav-icon fas fa-shopping-cart"></i>
                                 <p>Quản lý đơn hàng</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{route('promotions.index')}}" class="nav-link">
+                                <i class="nav-icon fas fa-tags"></i>
+                                <p>Quản lý khuyến mãi</p>
                             </a>
                         </li>
                         <li class="nav-item">

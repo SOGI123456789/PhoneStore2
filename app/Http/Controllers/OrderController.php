@@ -81,7 +81,10 @@ class OrderController extends Controller
             'customer_phone' => 'nullable|string|max:20',
             'customer_address' => 'nullable|string',
             'notes' => 'nullable|string',
-            'payment_method' => 'required|in:cod,bank_transfer'
+            'payment_method' => 'required|in:cod,bank_transfer',
+            'promotion_id' => 'nullable|integer|exists:promotions,id',
+            'promotion_code' => 'nullable|string|max:50',
+            'discount_amount' => 'nullable|numeric|min:0'
         ]);
 
         $cart = session()->get('cart', []);
@@ -89,20 +92,53 @@ class OrderController extends Controller
             return response()->json(['error' => 'Giỏ hàng của bạn đang trống!'], 400);
         }
 
-        $total = 0;
+        $subtotal = 0;
         foreach($cart as $item) {
-            $total += $item['price'] * $item['quantity'];
+            $subtotal += $item['price'] * $item['quantity'];
         }
 
+        // Xử lý khuyến mại
+        $promotionId = null;
+        $promotionCode = null;
+        $discountAmount = 0;
+        
+        if ($request->promotion_id && $request->promotion_code) {
+            $promotion = \App\Models\Promotion::find($request->promotion_id);
+            
+            if ($promotion && $promotion->code === $request->promotion_code) {
+                // Lấy danh sách product IDs trong giỏ hàng
+                $productIds = array_keys($cart);
+                
+                // Kiểm tra khuyến mại có thể áp dụng không
+                if ($promotion->canApplyToOrder($subtotal, $productIds)) {
+                    $calculatedDiscount = $promotion->calculateDiscount($subtotal, $productIds);
+                    
+                    if ($calculatedDiscount > 0) {
+                        $promotionId = $promotion->id;
+                        $promotionCode = $promotion->code;
+                        $discountAmount = $calculatedDiscount;
+                        
+                        // Tăng số lần sử dụng khuyến mại
+                        $promotion->incrementUsage();
+                    }
+                }
+            }
+        }
+
+        $finalTotal = $subtotal - $discountAmount;
+
         try {
-            // Tạo đơn hàng với thông tin khách hàng
+            // Tạo đơn hàng với thông tin khách hàng và khuyến mại
             $order = Order::create([
                 'user_id'         => Auth::check() ? Auth::id() : null,
                 'customer_name'   => $request->customer_name,
                 'customer_email'  => $request->customer_email,
                 'customer_phone'  => $request->customer_phone,
                 'customer_address'=> $request->customer_address,
-                'total_amount'    => $total,
+                'total_amount'    => $finalTotal,
+                'promotion_id'    => $promotionId,
+                'promotion_code'  => $promotionCode,
+                'discount_amount' => $discountAmount,
                 'status'          => 'pending',
                 'payment_method'  => $request->payment_method,
                 'payment_status'  => 'pending',
@@ -117,6 +153,17 @@ class OrderController extends Controller
                     'price'       => $item['price'],
                     'quantity'    => $item['quantity'],
                     'total'       => $item['price'] * $item['quantity']
+                ]);
+            }
+
+            // Lưu lịch sử sử dụng khuyến mại sau khi tạo đơn hàng thành công
+            if ($promotionId) {
+                \App\Models\PromotionUsage::create([
+                    'promotion_id' => $promotionId,
+                    'order_id' => $order->id,
+                    'user_id' => Auth::check() ? Auth::id() : null,
+                    'discount_amount' => $discountAmount,
+                    'used_at' => now()
                 ]);
             }
 

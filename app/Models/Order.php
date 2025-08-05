@@ -13,6 +13,9 @@ class Order extends Model
         'customer_phone',
         'customer_address',
         'total_amount',
+        'promotion_id',
+        'promotion_code',
+        'discount_amount',
         'status',
         'payment_method',
         'payment_status',
@@ -22,7 +25,8 @@ class Order extends Model
     // Cast các cột thành kiểu dữ liệu phù hợp
     protected $casts = [
         'created_at' => 'datetime',
-        'total_amount' => 'decimal:2'
+        'total_amount' => 'decimal:2',
+        'discount_amount' => 'decimal:2'
     ];
 
     public $timestamps = false; // Tắt timestamps nếu không muốn sử dụng updated_at
@@ -53,6 +57,12 @@ class Order extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    // Quan hệ với khuyến mại
+    public function promotion()
+    {
+        return $this->belongsTo(Promotion::class);
     }
 
     // Các trạng thái đơn hàng

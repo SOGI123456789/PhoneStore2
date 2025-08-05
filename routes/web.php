@@ -120,6 +120,24 @@ Route::prefix('roles')->name('roles.')->group(function () {
     Route::delete('/delete/{id}', [RoleController::class, 'delete'])->name('delete');
 });
 
+// PROMOTION ROUTES
+Route::prefix('promotions')->name('promotions.')->group(function () {
+    Route::get('/', [App\Http\Controllers\PromotionController::class, 'index'])->name('index');
+    Route::get('/create', [App\Http\Controllers\PromotionController::class, 'create'])->name('create');
+    Route::post('/', [App\Http\Controllers\PromotionController::class, 'store'])->name('store');
+    Route::get('/{promotion}', [App\Http\Controllers\PromotionController::class, 'show'])->name('show');
+    Route::get('/{promotion}/edit', [App\Http\Controllers\PromotionController::class, 'edit'])->name('edit');
+    Route::put('/{promotion}', [App\Http\Controllers\PromotionController::class, 'update'])->name('update');
+    Route::delete('/{promotion}', [App\Http\Controllers\PromotionController::class, 'destroy'])->name('destroy');
+    Route::patch('/{promotion}/toggle', [App\Http\Controllers\PromotionController::class, 'toggleStatus'])->name('toggle');
+});
+
+// API ROUTES cho khuyến mại
+Route::prefix('api/promotions')->group(function () {
+    Route::post('/check-code', [App\Http\Controllers\PromotionController::class, 'checkCode'])->name('api.promotions.check-code');
+    Route::get('/usable', [App\Http\Controllers\PromotionController::class, 'getUsablePromotions'])->name('api.promotions.usable');
+});
+
 // Customer routes với middleware auth
 Route::prefix('customer')->name('customer.')->middleware('auth')->group(function () {
     Route::get('/', [CustomerController::class, 'index'])->name('index');

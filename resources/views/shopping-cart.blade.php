@@ -33,6 +33,8 @@
 		<link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,400italic,600,600italic,700,700italic,800' rel='stylesheet' type='text/css'>
 		<link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
 
+		<!-- FontAwesome for icons -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 	</head>
 	<body class="cnt-home">
@@ -135,7 +137,7 @@
 
 			<!-- Shopping Cart Summary -->
 			<div class="row">
-				<div class="col-md-5">
+				<div class="col-md-6">
 					@if(count($cart) > 0)
 					<div class="customer-info">
 						<h3>Thông tin khách hàng</h3>
@@ -168,36 +170,114 @@
 					</div>
 					@endif
 				</div>
-				<div class="col-md-3">
-					<div class="cart-shopping-total">
-						<table class="table">
-							<thead>
-								<tr>
-									<th>
-										<div class="cart-sub-total">
-											Tổng tiền<span class="inner-left-md">{{ number_format($total, 0, ',', '.') }}đ</span>
-										</div>
-										<div class="cart-grand-total">
-											Thành tiền<span class="inner-left-md">{{ number_format($total, 0, ',', '.') }}đ</span>
-										</div>
-									</th>
-								</tr>
-							</thead><!-- /thead -->
-							<tbody>
-								<tr>
-									<td>
-										<div class="cart-checkout-btn pull-right">
-											@if(count($cart) > 0)
-												<button type="button" onclick="proceedToCheckout()" class="btn btn-primary checkout-btn">Gửi đơn hàng</button>
-												<button type="button" onclick="payWithMomo()" class="btn btn-success" style="margin-left:10px;">Thanh toán qua Momo</button>
-												<button type="button" onclick="payWithBankQr()" class="btn btn-info" style="margin-left:10px;">Thanh toán qua Ngân hàng</button>
-											@endif
-										</div>
-									</td>
-								</tr>
-							</tbody><!-- /tbody -->
-						</table><!-- /table -->
-					</div><!-- /.cart-shopping-total -->
+				<div class="col-md-6">
+					@if(count($cart) > 0)
+					<!-- Khối tổng hợp: Tổng tiền + Khuyến mãi + Thanh toán -->
+					<div class="checkout-summary" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background: #fff;">
+						
+						<!-- 1. Tổng tiền -->
+						<div class="total-section" style="margin-bottom: 25px;">
+							<h4 style="margin-bottom: 15px; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px;">
+								<i class="fas fa-calculator"></i> Tổng tiền
+							</h4>
+							<div class="cart-sub-total" style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+								<span>Tạm tính:</span>
+								<span id="subtotal-display">{{ number_format($total, 0, ',', '.') }}đ</span>
+							</div>
+							<div class="cart-discount" id="discount-row" style="display: none; color: #28a745; display: flex; justify-content: space-between; margin-bottom: 10px;">
+								<span>Giảm giá:</span>
+								<span id="discount-display">0đ</span>
+							</div>
+							<div class="cart-grand-total" style="display: flex; justify-content: space-between; font-weight: bold; font-size: 18px; border-top: 2px solid #eee; padding-top: 10px;">
+								<span>Thành tiền:</span>
+								<span id="total-display" style="color: #e74c3c;">{{ number_format($total, 0, ',', '.') }}đ</span>
+							</div>
+						</div>
+
+						<!-- 2. Khuyến mãi -->
+						<div class="promotion-section" style="margin-bottom: 25px; padding: 15px; border-radius: 5px; background: #f8f9fa; border: 1px solid #e9ecef;">
+							<h4 style="margin-bottom: 15px; color: #007bff; border-bottom: 2px solid #007bff; padding-bottom: 8px;">
+								<i class="fas fa-tags"></i> Mã khuyến mại
+							</h4>
+							
+							<!-- Thông báo khuyến mại -->
+							<div id="promotion-messages"></div>
+							
+							<!-- Hiển thị khuyến mại đã áp dụng -->
+							<div id="promotion-display"></div>
+							
+							<!-- Form nhập mã khuyến mại -->
+							<div class="form-group">
+								<div class="input-group">
+									<input type="text" 
+										   class="form-control" 
+										   id="promotion-code" 
+										   placeholder="Nhập mã khuyến mại"
+										   style="text-transform: uppercase; height: 42px;">
+									<div class="input-group-append">
+										<button type="button" 
+												class="btn btn-primary" 
+												id="apply-promotion-btn"
+												style="height: 42px; padding: 0 20px;">
+											<i class="fas fa-check"></i> Áp dụng
+										</button>
+									</div>
+								</div>
+							</div>
+							
+							<!-- Nút xem khuyến mại có thể sử dụng -->
+							<div class="text-center">
+								<button type="button" 
+										class="btn btn-link btn-sm" 
+										id="show-promotions-btn"
+										style="color: #007bff; padding: 0;">
+									<i class="fas fa-list"></i> Xem khuyến mại có thể sử dụng
+								</button>
+							</div>
+							
+							<!-- Hidden inputs để gửi form -->
+							<input type="hidden" id="promotion_id" name="promotion_id" value="">
+							<input type="hidden" id="promotion_code_hidden" name="promotion_code" value="">
+							<input type="hidden" id="discount_amount" name="discount_amount" value="0">
+						</div>
+
+						<!-- 3. Thanh toán -->
+						<div class="payment-section">
+							<h4 style="margin-bottom: 15px; color: #28a745; border-bottom: 2px solid #28a745; padding-bottom: 8px;">
+								<i class="fas fa-credit-card"></i> Phương thức thanh toán
+							</h4>
+							
+							<div class="payment-buttons">
+								<!-- Nút chính - Gửi đơn hàng -->
+								<button type="button" onclick="proceedToCheckout()" class="btn btn-primary btn-block payment-btn-main" style="margin-bottom: 15px; padding: 15px; font-size: 16px; font-weight: 600;">
+									<i class="fas fa-shopping-cart"></i> Gửi đơn hàng
+								</button>
+								
+								<!-- Hoặc thanh toán online -->
+								<div style="text-align: center; margin: 15px 0; color: #666; font-style: italic;">
+									— Hoặc thanh toán online —
+								</div>
+								
+								<!-- Các nút thanh toán online -->
+								<div class="row payment-online-row">
+									<div class="col-xs-6 col-sm-6">
+										<button type="button" onclick="payWithMomo()" class="btn btn-success btn-block payment-btn-online" style="padding: 12px 8px; font-size: 14px;">
+											<i class="fas fa-mobile-alt"></i><br>
+											<small>Momo</small>
+										</button>
+									</div>
+									<div class="col-xs-6 col-sm-6">
+										<button type="button" onclick="payWithBankQr()" class="btn btn-info btn-block payment-btn-online" style="padding: 12px 8px; font-size: 14px;">
+											<i class="fas fa-university"></i><br>
+											<small>Ngân hàng</small>
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+					@endif
 				</div>
 			</div>
 			
@@ -300,6 +380,9 @@
 	<script src="{{asset('assets/js/wow.min.js')}}"></script>
 	<script src="{{asset('assets/js/scripts.js')}}"></script>
 
+	<!-- Include promotion JavaScript -->
+	<script src="{{asset('assets/js/promotion.js')}}"></script>
+
 	<!-- Modal hiển thị mã QR Momo -->
 	<div class="modal fade" id="momoQrModal" tabindex="-1" role="dialog" aria-labelledby="momoQrModalLabel" aria-hidden="true">
 	  <div class="modal-dialog" role="document">
@@ -349,6 +432,55 @@
 		}
 	});
 
+	// Biến global để lưu thông tin đơn hàng
+	var currentOrderValue = {{ $total }};
+	var currentCartProducts = [
+		@foreach($cart as $id => $item)
+			{{ $id }}{{ !$loop->last ? ',' : '' }}
+		@endforeach
+	];
+
+	// Khởi tạo promotion manager khi trang load
+	$(document).ready(function() {
+		if (typeof promotionManager !== 'undefined') {
+			promotionManager.updateOrderInfo(currentOrderValue, currentCartProducts);
+		}
+		
+		// Lắng nghe sự kiện thay đổi khuyến mại
+		$(document).on('promotion:applied', function(event, promotion) {
+			updateOrderTotals(promotion);
+		});
+		
+		$(document).on('promotion:removed', function() {
+			updateOrderTotals(null);
+		});
+	});
+
+	function updateOrderTotals(promotion) {
+		var subtotal = {{ $total }};
+		var discount = promotion ? promotion.discount_amount : 0;
+		var total = subtotal - discount;
+		
+		// Cập nhật hiển thị
+		$('#subtotal-display').text(formatPrice(subtotal));
+		$('#discount-display').text('-' + formatPrice(discount));
+		$('#total-display').text(formatPrice(total));
+		
+		// Hiển thị/ẩn dòng giảm giá
+		if (discount > 0) {
+			$('#discount-row').show();
+		} else {
+			$('#discount-row').hide();
+		}
+		
+		// Cập nhật giá trị global
+		currentOrderValue = total;
+	}
+
+	function formatPrice(amount) {
+		return new Intl.NumberFormat('vi-VN').format(amount) + 'đ';
+	}
+
 	function proceedToCheckout(paymentType) {
 		var customerName = $('#customer_name').val();
 		var customerEmail = $('#customer_email').val();
@@ -359,6 +491,10 @@
 			return;
 		}
 		var payment_method = paymentType ? paymentType : $('#payment_method').val();
+		
+		// Lấy thông tin khuyến mại
+		var promotion = promotionManager ? promotionManager.getCurrentPromotion() : null;
+		
 		var customerData = {
 			customer_name: customerName,
 			customer_email: customerEmail,
@@ -366,8 +502,12 @@
 			customer_address: customerAddress,
 			notes: $('#notes').val(),
 			payment_method: payment_method,
+			promotion_id: promotion ? promotion.id : '',
+			promotion_code: promotion ? promotion.code : '',
+			discount_amount: promotion ? promotion.discount_amount : 0,
 			_token: $('meta[name="csrf-token"]').attr('content')
 		};
+		
 		if(confirm('Bạn có chắc muốn gửi đơn hàng này?')) {
 			$.ajax({
 				url: '{{ route("orders.create") }}',
@@ -495,6 +635,139 @@
 		}
 	}
 	</script>
+
+	<!-- CSS cho promotion section -->
+	<style>
+	.promotion-section {
+		background: #f8f9fa;
+		border: 1px solid #e9ecef;
+		border-radius: 8px;
+	}
+	
+	.promotion-section h4 {
+		margin-bottom: 15px;
+		font-size: 16px;
+		font-weight: 600;
+	}
+	
+	.promotion-applied {
+		background: #d4edda;
+		border: 1px solid #c3e6cb;
+		border-radius: 5px;
+		padding: 10px;
+		margin-bottom: 10px;
+		color: #155724;
+	}
+	
+	.promotion-applied .btn {
+		padding: 2px 8px;
+		font-size: 12px;
+	}
+	
+	.promotion-alert {
+		margin-bottom: 10px;
+		padding: 8px 12px;
+		border-radius: 4px;
+		font-size: 14px;
+	}
+	
+	.alert-success {
+		background-color: #d4edda;
+		border-color: #c3e6cb;
+		color: #155724;
+	}
+	
+	.alert-danger {
+		background-color: #f8d7da;
+		border-color: #f5c6cb;
+		color: #721c24;
+	}
+	
+	.alert-warning {
+		background-color: #fff3cd;
+		border-color: #ffeaa7;
+		color: #856404;
+	}
+	
+	.alert-info {
+		background-color: #d1ecf1;
+		border-color: #b8daff;
+		color: #0c5460;
+	}
+	
+	#promotion-code {
+		text-transform: uppercase;
+	}
+	
+	.cart-discount {
+		color: #28a745 !important;
+		font-weight: 500;
+	}
+	
+	.input-group {
+		display: flex;
+	}
+	
+	.input-group .form-control {
+		flex: 1;
+		border-right: none;
+		border-radius: 4px 0 0 4px;
+	}
+	
+	.input-group-append .btn {
+		border-radius: 0 4px 4px 0;
+		border-left: none;
+	}
+	
+	.btn-link {
+		text-decoration: none;
+	}
+	
+	.btn-link:hover {
+		text-decoration: underline;
+	}
+
+	/* CSS cho responsive payment buttons */
+	.payment-btn-main {
+		border-radius: 8px !important;
+		box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+		transition: all 0.3s ease;
+	}
+	
+	.payment-btn-main:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+	}
+	
+	.payment-btn-online {
+		border-radius: 6px !important;
+		transition: all 0.3s ease;
+		min-height: 60px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+	
+	.payment-btn-online:hover {
+		transform: translateY(-1px);
+		box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+	}
+	
+	.payment-online-row {
+		margin: 0 -5px;
+	}
+	
+	.payment-online-row .col-xs-6 {
+		padding: 0 5px;
+	}
+	
+	@media (min-width: 1025px) {
+		.payment-btn-online {
+			font-size: 14px;
+		}
+	}
+	</style>
 
 	
 
